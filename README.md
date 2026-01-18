@@ -120,6 +120,22 @@ The figure shows the percentage of non-equivalence (patch impact surface) of bot
     </td>
   </tr>
 </table>
-The (Left) figure presents a CVE of category CWE-190 which represents a numerical error from Linux in function vc4_get_bcl. Given the patching context, we extracted code segments capturing only changes in the patched code segment using the provided project versions. (Right) figure shows an example of extracted code segments from the patch shown in the left one where a new condition is added in the patched version. 
+The (Left) figure presents a CVE of category CWE-190 which represents a numerical error from Linux in function vc4_get_bcl. Given the patching context, we extracted code segments capturing only changes in the patched code segment using the provided project versions. (Right) figure shows an example of extracted code segments from the patch shown in the left one where a new condition is added in the patched version.
+
+## Bad-Good Example from Juliet Test Suite
+<table>
+  <tr>
+    <td width="33%" align="center">
+      <img src="Figures/original.png" width="500">
+    </td>
+    <td width="33%" valign="middle">
+       <img src="Figures/badPatch.png" width="500">
+    </td>
+    <td width="33%" valign="middle">
+       <img src="Figures/goodPatch.png" width="500">
+    </td>
+  </tr>
+</table>
+The example shows CWE-191_Integer_underflow example with original vulnerable code snippet(left), bad snippet (middle one) and good snippet (right most one). 
 
 
