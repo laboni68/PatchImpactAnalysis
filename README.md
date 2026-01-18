@@ -15,7 +15,10 @@
 
 ## Benchmarks
 - EqBench: CLEVER, dart, pow
-- PatchBench: qemu, linux, FFmpeg 
+- PatchBench: qemu, linux, FFmpeg
+- JulietBench (Bad and Good Patches)
+  - Juliet Test Suite 
+  - Juliet based PatchBench 
 
 ## Approaches
 - EqChecker.py
