@@ -1,4 +1,4 @@
-# PartialSymbolicAnalysis
+# Patch Impact Analysis
 
 ## Required Installation
 **Pre-requisite for running :**
@@ -48,3 +48,8 @@
 
 ## Convert from Bitvector to Dimacs cnf
 - pydimacs: https://github.com/RobinDavid/pydimacs.git
+
+## Workflow
+<p>
+  <img src="Figures/myApproach.png" width="500">
+</p>
