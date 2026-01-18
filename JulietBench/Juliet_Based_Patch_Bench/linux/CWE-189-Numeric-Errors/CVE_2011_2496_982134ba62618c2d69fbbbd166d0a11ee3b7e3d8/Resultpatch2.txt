@@ -1,0 +1,8 @@
+Not equivalent :(
+==========================
+[rcx = 1, rdx = 1, r8 = 263168, R = 1, rsi = 0, rdi = 0]{'rdi', 'rsi', 'rcx', 'rdx', 'R', 'r8'}True
+==========================
+Not nonequivalent for all the domain space
+At least one equivalent solution
+[rdx = 1, rcx = 0, r8 = 0, rdi = 0, rsi = 0, R = 1]
+Total time : 0.27743101119995117

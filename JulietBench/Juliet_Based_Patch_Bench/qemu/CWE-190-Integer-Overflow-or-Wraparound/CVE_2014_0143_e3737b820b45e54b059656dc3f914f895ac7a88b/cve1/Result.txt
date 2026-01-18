@@ -1,0 +1,12 @@
+oldV   newV   cveSnippet   None   None   3   None   None
+True
+Not equivalent :(
+==========================
+[rdi = 210764032, R = 843056128]
+{'R', 'rdi'}
+True
+==========================
+Not nonequivalent for all the domain space
+At least one equivalent solution
+[rdi = 0, R = 0]
+total time  0.19986891746520996

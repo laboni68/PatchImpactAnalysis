@@ -1,0 +1,8 @@
+Not equivalent :(
+==========================
+[rsi = 44, rdi = 127, R = 139]{'rsi', 'rdi', 'R'}True
+==========================
+Not nonequivalent for all the domain space
+At least one equivalent solution
+[rsi = 8, rdi = 0, R = 3]
+Total time : 0.18636465072631836

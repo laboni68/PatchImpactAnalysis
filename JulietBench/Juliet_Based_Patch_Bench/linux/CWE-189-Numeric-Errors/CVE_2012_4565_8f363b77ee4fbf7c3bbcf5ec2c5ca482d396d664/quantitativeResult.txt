@@ -1,0 +1,63 @@
+Satisfiability of solver : sat
+Variables : ['rsi', 'rdi', 'R']
+Number of variables : 2
+Calculate for 32 bits
+=======================ALGO : Divide And Search==================
+variable is : rsi
+++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++
+Total equivalence for variable rsi is 0
+Total nonequivalence for variable rsi is 4294967295
+Total range is 4294967296
+Percentage of variable rsi 0.0%
+variable is : rdi
+++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++
+Total equivalence for variable rdi is 1
+Total nonequivalence for variable rdi is 4294967295
+Total range is 4294967296
+Percentage of variable rdi 2.3283064365386963e-08%
+==============================================
+==============================================
+===========================ALGO : Range Search==================
+=======================
+For values greater than 0
+=======================
+variable is : rsi
+val 29 div 536870912 max_value 7
+variable is : rdi
+val 16 div 65536 max_value 65535
+=======================
+For values less than 0
+=======================
+variable is : rsi
+sat
+val 31 div 2147483648 min_value 0 : 0 is not included
+variable is : rdi
+unsat
+val 16 div 65536 min_value -65535
+=======================
+Check for value 0
+=======================
+variable is : rsi
+Equivalent for value 0
+variable is : rdi
+Not equivalent for 0
+==============================================
+==============================================
+Total domain is 18446744073709551616
+variable rsi
+total equivalent domain is 8
+total nonequivalent domain is 4294967288
+variable rdi
+total equivalent domain is 131070
+total nonequivalent domain is 4294836226
+===================Percentage of equivalence domain===================
+For variable rsi
+For variable rdi
+Final total equivalent tuples are 562975722176528
+Final percentage of tuples 0.003051897505201937%
+Final upper bounded nonequivalent tuples are 18446181097987375088
+Final percentage of tuples 99.9969481024948%
+total time 9.25597620010376 s
+total time 0.15426627000172932 m

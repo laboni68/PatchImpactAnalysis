@@ -1,0 +1,10 @@
+Satisfiability of solver : sat
+rsi
+rdi
+R
+Calculate for 32 bits
+Multi dimensional divide N search
+i = 0 is rsi
+[-2147483648, 2147483648, 'rsi']
+i = 1 is rdi
+[-2147483648, 2147483648, 'rdi']

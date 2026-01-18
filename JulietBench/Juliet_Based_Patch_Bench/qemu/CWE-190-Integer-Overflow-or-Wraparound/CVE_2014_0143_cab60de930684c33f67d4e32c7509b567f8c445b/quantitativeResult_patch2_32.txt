@@ -1,0 +1,46 @@
+Satisfiability of solver : sat
+Variables : ['rdi', 'R']
+Number of variables : 1
+Calculate for 32 bits
+=======================ALGO : Divide And Search==================
+variable is : rdi
+++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++
+Before rdi is 4294967295 After 4294967296
+Total equivalence for variable rdi is 4294967296
+Total nonequivalence for variable rdi is 0
+Total range is 4294967296
+Percentage of variable rdi 100.0%
+==============================================
+==============================================
+===========================ALGO : Range Search==================
+=======================
+For values greater than 0
+=======================
+variable is : rdi
+val 0 div 1 max_value 2147483647
+=======================
+For values less than 0
+=======================
+variable is : rdi
+unsat
+val 0 div 1 min_value -2147483648
+=======================
+Check for value 0
+=======================
+variable is : rdi
+Equivalent for value 0
+==============================================
+==============================================
+Total domain is 4294967296
+variable rdi
+total equivalent domain is 4294967296
+total nonequivalent domain is 0
+===================Percentage of equivalence domain===================
+For variable rdi
+Final total equivalent tuples are 4294967296
+Final percentage of tuples 100.0%
+Final upper bounded nonequivalent tuples are 0
+Final percentage of tuples 0.0%
+total time 0.028399944305419922 s
+total time 0.000473332405090332 m

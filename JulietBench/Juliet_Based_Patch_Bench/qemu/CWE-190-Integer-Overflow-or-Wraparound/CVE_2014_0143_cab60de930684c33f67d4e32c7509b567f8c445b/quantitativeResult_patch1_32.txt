@@ -1,0 +1,61 @@
+Satisfiability of solver : sat
+Variables : ['rdi', 'R']
+Number of variables : 1
+Calculate for 32 bits
+=======================ALGO : Divide And Search==================
+variable is : rdi
+Total nonequivalence for 285212671 to 301989886
+Total nonequivalence for 301989887 to 335544318
+Total nonequivalence for 335544319 to 402653182
+Total nonequivalence for 402653183 to 536870910
+Total nonequivalence for 536870911 to 1073741822
+Total nonequivalence for 1073741823 to 2147483646
+++++++++++++++++++++++++++++++++++++++++
+[-2147483648, -2]
+[-1, -1]
+[268435455, 285212670]
+[285212671, 301989886]
+[301989887, 335544318]
+[335544319, 402653182]
+[402653183, 536870910]
+[536870911, 1073741822]
+[1073741823, 2147483646]
+++++++++++++++++++++++++++++++++++++++++
+Before rdi is 268435455 After 268435455
+Total equivalence for variable rdi is 268435455
+Total nonequivalence for variable rdi is 4026531841
+Total range is 4294967296
+Percentage of variable rdi 6.249999976716936%
+==============================================
+==============================================
+===========================ALGO : Range Search==================
+=======================
+For values greater than 0
+=======================
+variable is : rdi
+val 4 div 16 max_value 268435455
+=======================
+For values less than 0
+=======================
+variable is : rdi
+sat
+val 31 div 2147483648 min_value 0 : 0 is not included
+=======================
+Check for value 0
+=======================
+variable is : rdi
+Equivalent for value 0
+==============================================
+==============================================
+Total domain is 4294967296
+variable rdi
+total equivalent domain is 268435456
+total nonequivalent domain is 4026531840
+===================Percentage of equivalence domain===================
+For variable rdi
+Final total equivalent tuples are 268435456
+Final percentage of tuples 6.25%
+Final upper bounded nonequivalent tuples are 4026531840
+Final percentage of tuples 93.75%
+total time 0.8182709217071533 s
+total time 0.013637848695119222 m

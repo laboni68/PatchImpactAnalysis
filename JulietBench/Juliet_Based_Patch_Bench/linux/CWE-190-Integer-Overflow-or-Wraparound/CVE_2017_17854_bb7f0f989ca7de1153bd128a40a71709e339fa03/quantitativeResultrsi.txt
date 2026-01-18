@@ -1,0 +1,27 @@
+Satisfiability of solver : sat
+Variables : ['rdi', 'R']
+Number of variables : 1
+Calculate for unsigned 64
+=======================ALGO : Divide And Search==================
+==============================================
+==============================================
+===========================ALGO : Range Search==================
+=======================
+For values greater than mid 9223372036854775808
+=======================
+=======================
+For values less than mid 9223372036854775808
+=======================
+=======================
+Check for value 0
+=======================
+==============================================
+==============================================
+Total domain is 18446744073709551616
+===================Percentage of equivalence domain===================
+Final total equivalent tuples are 0
+Final percentage of tuples 0.0%
+Final upper bounded nonequivalent tuples are 18446744073709551616
+Final percentage of tuples 100.0%
+total time 0.004889011383056641 s
+total time 8.148352305094401e-05 m

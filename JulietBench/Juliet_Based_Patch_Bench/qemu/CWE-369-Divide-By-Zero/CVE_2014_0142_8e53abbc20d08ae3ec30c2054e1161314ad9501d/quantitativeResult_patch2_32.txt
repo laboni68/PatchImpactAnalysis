@@ -1,0 +1,97 @@
+Satisfiability of solver : sat
+Variables : ['rdi', 'R']
+Number of variables : 1
+Calculate for 32 bits
+=======================ALGO : Divide And Search==================
+variable is : rdi
+Total nonequivalence for 50331647 to 67108862
+Total nonequivalence for 83886079 to 100663294
+Total nonequivalence for 100663295 to 134217726
+Total nonequivalence for 150994943 to 167772158
+Total nonequivalence for 167772159 to 201326590
+Total nonequivalence for 201326591 to 268435454
+Total nonequivalence for 285212671 to 301989886
+Total nonequivalence for 301989887 to 335544318
+Total nonequivalence for 335544319 to 402653182
+Total nonequivalence for 402653183 to 536870910
+Total nonequivalence for 553648127 to 570425342
+Total nonequivalence for 570425343 to 603979774
+Total nonequivalence for 603979775 to 671088638
+Total nonequivalence for 671088639 to 805306366
+Total nonequivalence for 805306367 to 1073741822
+Total nonequivalence for 1090519039 to 1107296254
+Total nonequivalence for 1107296255 to 1140850686
+Total nonequivalence for 1140850687 to 1207959550
+Total nonequivalence for 1207959551 to 1342177278
+Total nonequivalence for 1342177279 to 1610612734
+Total nonequivalence for 1610612735 to 2147483646
+++++++++++++++++++++++++++++++++++++++++
+[-2147483648, -2]
+[-1, 16777214]
+[16777215, 33554430]
+[33554431, 50331646]
+[50331647, 67108862]
+[67108863, 83886078]
+[83886079, 100663294]
+[100663295, 134217726]
+[134217727, 150994942]
+[150994943, 167772158]
+[167772159, 201326590]
+[201326591, 268435454]
+[268435455, 285212670]
+[285212671, 301989886]
+[301989887, 335544318]
+[335544319, 402653182]
+[402653183, 536870910]
+[536870911, 553648126]
+[553648127, 570425342]
+[570425343, 603979774]
+[603979775, 671088638]
+[671088639, 805306366]
+[805306367, 1073741822]
+[1073741823, 1090519038]
+[1090519039, 1107296254]
+[1107296255, 1140850686]
+[1140850687, 1207959550]
+[1207959551, 1342177278]
+[1342177279, 1610612734]
+[1610612735, 2147483646]
+++++++++++++++++++++++++++++++++++++++++
+Before rdi is 0 After 0
+Total equivalence for variable rdi is 0
+Total nonequivalence for variable rdi is 4294967296
+Total range is 4294967296
+Percentage of variable rdi 0.0%
+==============================================
+==============================================
+===========================ALGO : Range Search==================
+=======================
+For values greater than 0
+=======================
+variable is : rdi
+val 30 div 1073741824 max_value 2
+=======================
+For values less than 0
+=======================
+variable is : rdi
+sat
+val 31 div 2147483648 min_value 0 : 0 is not included
+=======================
+Check for value 0
+=======================
+variable is : rdi
+Not equivalent for 0
+==============================================
+==============================================
+Total domain is 4294967296
+variable rdi
+total equivalent domain is 2
+total nonequivalent domain is 4294967294
+===================Percentage of equivalence domain===================
+For variable rdi
+Final total equivalent tuples are 2
+Final percentage of tuples 4.6566128730773926e-08%
+Final upper bounded nonequivalent tuples are 4294967294
+Final percentage of tuples 99.99999995343387%
+total time 154.77768564224243 s
+total time 2.579628094037374 m

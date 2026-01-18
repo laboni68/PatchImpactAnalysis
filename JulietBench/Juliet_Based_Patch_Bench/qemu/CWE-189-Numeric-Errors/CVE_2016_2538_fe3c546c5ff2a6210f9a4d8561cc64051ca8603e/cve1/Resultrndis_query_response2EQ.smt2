@@ -1,0 +1,15 @@
+; benchmark generated from python API
+(set-info :status unknown)
+(declare-fun R () (_ BitVec 32))
+(declare-fun rdi () (_ BitVec 64))
+(assert
+ (let (($x52 (= (_ bv4294967293 32) R)))
+ (let ((?x6 ((_ extract 31 0) rdi)))
+ (let (($x11 (bvult ?x6 (_ bv1 32))))
+ (let (($x53 (and $x11 $x52)))
+ (let (($x49 (= (_ bv0 32) R)))
+ (let (($x43 (bvuge ?x6 (_ bv1 32))))
+ (let (($x50 (and $x43 $x49)))
+ (let (($x54 (or $x50 $x53)))
+ (and $x54 $x52))))))))))
+(check-sat)

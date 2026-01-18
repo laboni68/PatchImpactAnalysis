@@ -1,0 +1,8 @@
+Not equivalent :(
+==========================
+[rsi = 1024, R = 0]{'rsi', 'R'}True
+==========================
+Not nonequivalent for all the domain space
+At least one equivalent solution
+[rsi = 0, R = 0]
+Total time : 0.23450970649719238
