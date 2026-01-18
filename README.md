@@ -50,6 +50,73 @@
 - pydimacs: https://github.com/RobinDavid/pydimacs.git
 
 ## Workflow
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="Figures/myApproach.png" width="500">
+    </td>
+    <td width="40%" valign="middle">
+     The workflow of the partial equivalence analysis technique we present in the paper is shown in Figure. The EqChecker component (Algorithm 1) determines if the given programs are equivalent, totally non-equivalent, or partially equivalent. If two given programs are partially equivalent, our range-based search technique, which we present in the next section, provides (i) the equivalence condition and (ii) the equivalence percentage, i.e., the percentage of the input domain for which the given programs are equivalent.
+    </td>
+  </tr>
+</table>
+<!--
 <p>
   <img src="Figures/myApproach.png" width="500">
 </p>
+-->
+
+
+
+## Motivating Example from Qemu 
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="Figures/qemuMotivatingExample.png" width="500">
+    </td>
+    <td width="40%" valign="middle">
+        A patch from Qemu is shown in the figure where a modification is made to prevent buffer overflow by changing the type of the variable in_use at line 180, which is later used in line 1362. Our quantitative patch impact analysis shows that this update will impact 50% of the inputs for variable in_use with the corresponding non-equivalence condition: 2147483648 <= in_use.
+    </td>
+  </tr>
+</table>
+
+<!--
+<p>
+  <img src="Figures/qemuMotivatingExample.png" width="500">
+</p>
+A patch from Qemu is shown in the figure where a modification is made to prevent buffer overflow by changing the type of the variable in_use at line 180, which is later used in line 1362. Our quantitative patch impact analysis shows that this update will impact 50% of the inputs for variable in_use with the corresponding non-equivalence condition: 2147483648 <= in_use.
+-->
+
+## Patch Impact Analysis of EqBench 
+<table>
+  <tr>
+    <td width="45%" align="center">
+      <img src="Figures/patchImpactWithEqBench.png" width="500">
+    </td>
+    <td width="40%" valign="middle">
+      The figure shows the percentage of non-equivalence (patch impact surface) of both PatchBench and EqBench. For EqBench, 62.5% of the program pairs exhibit non-equivalence for less than 10% of their input domain, with only one pair being non-equivalent for 99.99%. 
+    </td>
+  </tr>
+</table>
+
+<!--
+<p>
+  <img src="Figures/patchImpactWithEqBench.png" width="500">
+</p>
+The figure shows the percentage of non-equivalence (patch impact surface) of both PatchBench and EqBench. For EqBench, 62.5% of the program pairs exhibit non-equivalence for less than 10% of their input domain, with only one pair being non-equivalent for 99.99%. 
+-->
+
+## Patch Dataset from Git Commits of CVEs
+<table>
+  <tr>
+    <td width="45%" align="center">
+      <img src="Figures/patchDatasetMakingGitCommit2.png" width="500">
+    </td>
+    <td width="40%" valign="middle">
+       <img src="Figures/patchDatasetMaking2.png" width="500">
+    </td>
+  </tr>
+</table>
+The (Left) figure presents a CVE of category CWE-190 which represents a numerical error from Linux in function vc4_get_bcl. Given the patching context, we extracted code segments capturing only changes in the patched code segment using the provided project versions. (Right) figure shows an example of extracted code segments from the patch shown in the left one where a new condition is added in the patched version. 
+
+
