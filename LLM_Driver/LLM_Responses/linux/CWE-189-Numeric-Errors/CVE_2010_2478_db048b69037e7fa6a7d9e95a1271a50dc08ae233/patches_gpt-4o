@@ -1,0 +1,27 @@
+reply: Certainly! Below are the additional patches (Patch 2 and Patch 3) for the given original code snippet following the same format as the examples provided.
+
+```json
+{
+    "Example 3": {
+        "CWE": "CWE-190-Integer-Overflow",
+        "Project": "unknown",
+        "Patch Information": "Juliet Dataset style patch generation",
+        "Original Code snippet": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\n#define u32 unsigned int\n\nint ethtool_get_rxnfc_Snippet(u32 info_rule_cnt){\n    if (info_rule_cnt > 0) {\n                return info_rule_cnt * sizeof(u32);\n\t\t}\n    return -1;\n}\n\nint main(){\n return 0;\n}",
+        
+        "Patch 1 (Good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\n#define PAGE_SHIFT\t13\n#define MAX_ORDER 11\n#define u32 unsigned int\n#define KMALLOC_SHIFT_HIGH\t((MAX_ORDER + PAGE_SHIFT - 1) <= 25 ? \\\n\t\t\t\t(MAX_ORDER + PAGE_SHIFT - 1) : 25)\n\n#define KMALLOC_MAX_SIZE\t(1UL << KMALLOC_SHIFT_HIGH)\n\nint ethtool_get_rxnfc_Snippet(u32 info_rule_cnt){\n    if (info_rule_cnt > 0) {\n\t\t\tif (info_rule_cnt <= KMALLOC_MAX_SIZE / sizeof(u32))\n                return info_rule_cnt * sizeof(u32);\n\t\t}\n    return -1;\n}\n\nint main(){\n return 0;\n}",
+
+        "Patch 2 (Good source)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\n#define u32 unsigned int\n\nint ethtool_get_rxnfc_Snippet(u32 info_rule_cnt){\n    /* === GOOD SOURCE ONLY === */\n    u32 safe_rule_cnt = 1; // Safe, small source value\n\n    if (safe_rule_cnt > 0) {\n        return safe_rule_cnt * sizeof(u32);\n    }\n    return -1;\n}\n\nint main(){\n return 0;\n}",
+
+        "Patch 3 (Bad source Partial good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\n#define PAGE_SHIFT\t13\n#define MAX_ORDER 11\n#define u32 unsigned int\n#define KMALLOC_SHIFT_HIGH\t((MAX_ORDER + PAGE_SHIFT - 1) <= 25 ? \\\n\t\t\t\t(MAX_ORDER + PAGE_SHIFT - 1) : 25)\n\n#define KMALLOC_MAX_SIZE\t(1UL << KMALLOC_SHIFT_HIGH)\n\nint ethtool_get_rxnfc_Snippet(u32 info_rule_cnt){\n    /* === PARTIAL GOOD SINK === */\n    if (info_rule_cnt > 0 && info_rule_cnt <= 100) { // Only safe within this range\n        return info_rule_cnt * sizeof(u32);\n    }\n\n    /* === OUTSIDE SAFE RANGE ===\n    * No multiplication performed to avoid overflow,\n    * but also no real \"fix\". Just return a fallback.\n    */\n    return -1;\n}\n\nint main(){\n return 0;\n}"
+    }
+}
+```
+
+### Explanation:
+
+- **Patch 2 (Good source):**
+  - The `info_rule_cnt` is reset to a safe, small number (1), which ensures there's no risk of excessive memory allocation or integer overflow during multiplication regardless of the input.
+
+- **Patch 3 (Bad source Partial good sink):**
+  - A range check is added to allow safe multiplication only when `info_rule_cnt` is between 1 and 100. The partial fix avoids any operation when `info_rule_cnt` exceeds this range, preventing overflow but doesn't extend beyond this limited range.
+System fingerprint: fp_ed643dde95

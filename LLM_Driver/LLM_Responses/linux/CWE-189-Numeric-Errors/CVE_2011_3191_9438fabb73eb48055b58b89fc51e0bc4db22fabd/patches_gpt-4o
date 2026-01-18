@@ -1,0 +1,79 @@
+reply: Based on the provided examples and your instructions, here are the generated Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) patches for the provided `CIFSFindNext_Snippet` function.
+
+**Patch 2 (Good source):**
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h>
+
+#define EINVAL 22
+#define PATH_MAX        4096   /* # chars in a path name including nul */
+#define __u16 unsigned short
+
+int CIFSFindNext_Snippet(unsigned int name_len)
+{
+    int rc = 0;
+    __u16 byte_count = 0;
+
+    /* === GOOD SOURCE ONLY === */
+    /* Assign a safe, known-good value to name_len */
+    name_len = PATH_MAX / 2;  // Assign a value safely within limits
+
+    if (name_len < PATH_MAX) {
+        byte_count += name_len;
+        /* 14 byte parm len above enough for 2 byte null terminator */
+    } else {
+        rc = -EINVAL;
+    }
+    return rc;
+}
+
+int main(){
+ return 0;
+}
+```
+
+**Patch 3 (Bad source Partial good sink):**
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h>
+
+#define EINVAL 22
+#define PATH_MAX        4096   /* # chars in a path name including nul */
+#define __u16 unsigned short
+
+int CIFSFindNext_Snippet(unsigned int name_len)
+{
+    int rc = 0;
+    __u16 byte_count = 0;
+
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when:
+    *       1 < name_len < 1024
+    * This fix avoids issues with extreme lengths, but only for this range.
+    */
+
+    if (name_len > 1 && name_len < 1024) {
+        /* Safe range */
+        byte_count += name_len;
+        /* 14 byte parm len above enough for 2 byte null terminator */
+    } else {
+        /* === OUTSIDE SAFE RANGE ===
+        * No real "fix". Just return a fallback.
+        */
+        rc = -EINVAL;
+    }
+    
+    return rc;
+}
+
+int main(){
+ return 0;
+}
+```
+
+With these patches, Patch 2 ensures that a safe, non-extreme value is always used for `name_len`, thereby preventing any potential issues with input values. Patch 3 provides a partial fix by only allowing safe operations within a specific range of `name_len`, addressing the issue for a limited subset of possible input values while offering a fallback for other cases.
+System fingerprint: fp_37d212baff

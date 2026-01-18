@@ -1,0 +1,26 @@
+reply: Certainly! Below are the Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) generated based on the format and the guidelines given in your JSON template for the original code snippet.
+
+```json
+{
+    "Example 3": {
+        "CWE": "CWE-367-Time-Of-Check-Time-Of-Use (TOCTOU) Race Condition",
+        "CVE": "CVE-XXXX-XXXX",
+        "Project": "qemu",
+        "Patch Information": "Juliet Dataset style patch generation",
+        "Original Code snippet": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\nint usb_net_handle_dataout(uint32_t len,uint32_t offs, uint32_t size){\n     if (offs + size <= len) {\n        return offs;\n    }\n    return 0;\n}\n\nint main(){\n return 0;\n}  ",
+        
+        "Patch 1 (Good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\nint usb_net_handle_dataout(uint32_t len,uint32_t offs, uint32_t size){\n     if (offs < len && size < len && offs + size <= len) {\n        return offs;\n    }\n    return 0;\n}\n\nint main(){\n return 0;\n}  ",
+        
+        "Patch 2 (Good source)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\nint usb_net_handle_dataout(uint32_t len, uint32_t offs, uint32_t size) {\n    /* === GOOD SOURCE ONLY === */\n    /* Assign a known valid range to offs and size */\n    offs = 1;   // Chosen to be a valid offset\n    size = 1;   // Chosen to be a valid size within bounds\n\n    if (offs + size <= len) {\n        return offs;\n    }\n    return 0;\n}\n\nint main() {\n    return 0;\n}\n",
+        
+        "Patch 3 (Bad source Partial good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\nint usb_net_handle_dataout(uint32_t len, uint32_t offs, uint32_t size) {\n    /* === PARTIAL GOOD SINK ===\n    * Fix applies ONLY when:\n    *        1 <= offs < 100\n    * This avoids out-of-bounds access, but only for the limited range.\n    */\n    if (offs < len && offs >= 1 && offs < 100 && offs + size <= len) {\n        /* Safe range */\n        return offs;\n    }\n\n    /* === OUTSIDE SAFE RANGE ===\n    * No processing performed to avoid crashes,\n    * but also no real \"fix\". Just return a fallback.\n    */\n    return 0;   // or another constant fallback\n}\n\nint main() {\n    return 0;\n}\n"
+    }
+}
+```
+
+Explanation:
+
+- **Patch 2 (Good source)**: This patch assigns fixed, known safe values to the `offs` and `size` parameters before the computation. These values are chosen to ensure the function operates within safe bounds despite the absence of checks in the function logic.
+
+- **Patch 3 (Bad source Partial good sink)**: This patch introduces a condition to partially validate the safe execution when `offs` is between 1 and 100, assuming these are safe operational bounds. However, outside this range, it does not perform any processing or division, similar to your mention of a fallback approach. Also, it acknowledges the absence of a comprehensive solution outside this range.
+System fingerprint: fp_37d212baff

@@ -1,0 +1,68 @@
+reply: To create Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) based on the template and given original code snippet, let's generate the patches accordingly:
+
+### Original Code Snippet (Example 3)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int example_function_Snippet(int value) {
+    /* === ORIGINAL BUGGY CODE === */
+    return 42 / value;  // Potential division by zero
+}
+
+int main() {
+    return 0;
+}
+```
+
+### Patch 2 (Good Source)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int example_function_Snippet(int value) {
+    /* === GOOD SOURCE ONLY === */
+    /* Assign a safe, non-zero value to value */
+    value = 1;  // Safe, non-zero source
+
+    return 42 / value;  // Safe computation
+}
+
+int main() {
+    return 0;
+}
+```
+
+### Patch 3 (Bad Source Partial Good Sink)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int example_function_Snippet(int value) {
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when:
+    *     1 <= value <= 10
+    * This avoids division-by-zero, but only for the limited range.
+    */
+    if (value >= 1 && value <= 10) {
+        /* Safe range */
+        return 42 / value;  // Safe computation
+    }
+
+    /* === OUTSIDE SAFE RANGE ===
+    * No division performed to avoid crashes,
+    * but also no real "fix". Just return a fallback.
+    */
+    return 0;  // or another constant fallback
+}
+
+int main() {
+    return 0;
+}
+```
+
+In Patch 2, we guarantee the division operation is safe by setting a fixed, non-zero value to `value`. In Patch 3, we address the vulnerability only when `value` is within a specified safe range, and provide a fallback for values outside of that range.
+System fingerprint: fp_37d212baff

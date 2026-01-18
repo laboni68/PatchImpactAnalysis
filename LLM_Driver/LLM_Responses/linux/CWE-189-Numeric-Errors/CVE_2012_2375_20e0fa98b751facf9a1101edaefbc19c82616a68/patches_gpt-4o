@@ -1,0 +1,65 @@
+reply: Certainly! Below are Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) for the provided code snippet, based on the style demonstrated in the JSON template.
+
+### Patch 2 (Good Source)
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int __nfs4_get_acl_uncached_Snippet(size_t buflen, size_t res_acl_data_offset) {
+    int acl_len = 0;
+
+    /* === GOOD SOURCE ONLY === */
+    /* Assign safe, correct values to prevent erroneous computations */
+    buflen = 100;  // Example safe value
+    res_acl_data_offset = 50;  // Example safe value, ensuring no underflow occurs
+
+    /* === BAD SINK (NO CHECKS) === */
+    /* Since the source is safe, calculations proceed without additional checks */
+    acl_len = buflen - res_acl_data_offset;
+
+    return acl_len;
+}
+
+int main() {
+    return 0;
+}
+```
+
+### Patch 3 (Bad Source Partial Good Sink)
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int __nfs4_get_acl_uncached_Snippet(size_t buflen, size_t res_acl_data_offset) {
+    int acl_len = 0;
+
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when:
+    *       res_acl_data_offset < buflen
+    * This avoids computation errors, but only for the limited condition.
+    */
+
+    if (res_acl_data_offset < buflen) {
+        /* Safe range as long as offset < buflen */
+        acl_len = buflen - res_acl_data_offset;
+        return acl_len;
+    }
+
+    /* === OUTSIDE SAFE RANGE ===
+    * Prevent underflow by avoiding calculation,
+    * and return a fallback value instead.
+    */
+    return 0;  // or another constant fallback
+}
+
+int main() {
+    return 0;
+}
+```
+
+In Patch 2, the emphasis is on assigning safe values to avoid the issues, while Patch 3 provides a limited condition check before performing the operation, returning a fallback when outside of the safe range.
+System fingerprint: fp_a4d13246c5

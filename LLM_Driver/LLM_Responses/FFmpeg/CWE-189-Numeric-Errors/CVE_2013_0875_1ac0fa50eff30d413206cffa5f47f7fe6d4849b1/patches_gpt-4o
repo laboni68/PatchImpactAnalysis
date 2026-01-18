@@ -1,0 +1,68 @@
+reply: Certainly! Following the Juliet Dataset style patch generation and using your provided example, here are the requested patches:
+
+### Patch 2 (Good Source)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h>
+
+int ff_add_png_paeth_prediction_Snippet(int bpp, int size)
+{
+    int i = 0, r = 0;
+
+    /* === GOOD SOURCE ONLY === */
+    /* Assign a safe, non-zero value to bpp */
+    bpp = 1;  // Ensure bpp is non-zero to prevent infinite loop
+
+    /* === BAD SINK (NO CHECKS) === */
+    /* Vulnerable if bpp were zero initially, but our source makes it safe */
+    for (; i <= size; i += bpp) {
+        r = r + i;
+    }
+    return r;
+}
+
+int main(){
+    return 0;
+}
+```
+
+### Patch 3 (Bad Source Partial Good Sink)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h>
+
+int ff_add_png_paeth_prediction_Snippet(int bpp, int size)
+{
+    int i = 0, r = 0;
+
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when:
+    *     bpp = 1 and size <= 100
+    * This avoids problematic increment logic, but only for the limited range.
+    */
+
+    if (bpp == 1 && size <= 100) {
+        /* Safe range */
+        for (; i <= size - bpp; i += bpp) {
+            r = r + i;
+        }
+    } else {
+        /* === OUTSIDE SAFE RANGE ===
+        * No computation performed to avoid errors,
+        * but also no real "fix". Just return a fallback.
+        */
+        return 0;  // or another constant fallback
+    }
+
+    return r;
+}
+
+int main(){
+    return 0;
+}
+```
+
+These patches follow the same pattern from the respective examples you provided. Patch 2 assigns a safe value to `bpp` to ensure safe operation, while Patch 3 only safely operates within a conditional range.
+System fingerprint: fp_ed643dde95

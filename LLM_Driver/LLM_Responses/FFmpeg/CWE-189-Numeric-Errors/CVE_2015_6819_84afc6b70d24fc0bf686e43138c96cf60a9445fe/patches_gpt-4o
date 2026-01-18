@@ -1,0 +1,16 @@
+reply: Certainly! Here are Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) based on the provided JSON template and original code snippet.
+
+```json
+{
+    "Original Code snippet": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \nuint8_t* ff_mjpeg_decode_frame_Snippet(int w, int is16bit){\n uint8_t *line={0};\n if (is16bit) {\n        ((uint16_t*)line)[w - 1] = ((uint16_t*)line)[w - 2]= ((uint16_t*)line)[(w - 1) / 3];\n            } else {\n                line[w - 1] =  line[w - 2] = line[w - 1];\n            }\n    return line;\n}\n\nint main(){\n return 0;\n}",
+
+    "Patch 2 (Good source)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\nuint8_t* ff_mjpeg_decode_frame_Snippet(int w, int is16bit){\n    /* === GOOD SOURCE ONLY === */\n    // Assign safe non-zero values ensuring w > 2 for safe index access\n    w = 3;\n    uint8_t *line = malloc(w * sizeof(uint8_t));\n    if (!line) return NULL; // Ensure allocation success\n\n    if (is16bit) {\n        ((uint16_t*)line)[w - 1] = ((uint16_t*)line)[w - 2] = ((uint16_t*)line)[(w - 1) / 3];\n    } else {\n        line[w - 1] = line[w - 2] = line[w - 1];\n    }\n    return line;\n}\n\nint main(){\n    return 0;\n}",
+
+    "Patch 3 (Bad source Partial good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\nuint8_t* ff_mjpeg_decode_frame_Snippet(int w, int is16bit){\n    uint8_t *line={0};\n\n    /* === PARTIAL GOOD SINK ===\n    * Fix applies ONLY when:\n    *     w >= 3\n    * This ensures safe access to array indices in both 'if' and 'else' branches.\n    */\n    if (w >= 3) {\n        if (is16bit) {\n            ((uint16_t*)line)[w - 1] = ((uint16_t*)line)[(w - 1) / 3];\n            ((uint16_t*)line)[w - 2] = ((uint16_t*)line)[w - 1];\n        } else {\n            line[w - 1] = line[(w - 1) / 3];\n            line[w - 2] = line[w - 1];\n        }\n    }\n\n    /* === OUTSIDE SAFE RANGE ===\n    * No operation performed to avoid unsafe memory access\n    */\n\n    return line;\n}\n\nint main(){\n    return 0;\n}"
+}
+```
+
+### Explanation:
+- **Patch 2 (Good source):** This patch assigns a safe non-zero value to `w` that ensures the code does not access out-of-bounds indices. Memory allocation for `line` ensures it is safely initialized.
+- **Patch 3 (Bad source Partial good sink):** The patch only applies the fix for cases where `w >= 3`, ensuring safe access to array indices. If `w` is less than 3, no operations that could risk a segmentation fault are performed.
+System fingerprint: fp_a4d13246c5

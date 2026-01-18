@@ -1,0 +1,14 @@
+reply: Sure! Based on the JSON template and the original code snippet you provided, here are Patch 2 (Good source) and Patch 3 (Bad source Partial good sink):
+
+```json
+{
+  "Patch 2 (Good source)": 
+  "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define WARN_ON_ONCE(x) (x)\n#define u32 uint32_t\n#define u64 uint64_t\n\nu64 tcp_cwnd_reduction_Snippet(int newly_acked_sacked, u32 tp_prior_cwnd)\n{\n    u32 tp_prr_delivered = 28; // Assuming tp->u32 prr_delivered with initial value as 28\n\n    /* === GOOD SOURCE ONLY === */\n    /* Assign safe, non-zero values */\n    newly_acked_sacked = 10;\n    tp_prior_cwnd = 1;\n\n    tp_prr_delivered += newly_acked_sacked;\n    int tp_snd_ssthresh = 50; // Assuming (u64)tp->snd_ssthresh is a concrete value of 50\n    // if (delta < 0) { // considering delta < 0\n    u64 dividend = tp_snd_ssthresh * tp_prr_delivered +\n                   tp_prior_cwnd - 1;\n    // }\n    return dividend;\n}\n\nint main(){\n return 0;\n}",
+    
+  "Patch 3 (Bad source Partial good sink)": 
+  "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define WARN_ON_ONCE(x) (x)\n#define u32 uint32_t\n#define u64 uint64_t\n\nu64 tcp_cwnd_reduction_Snippet(int newly_acked_sacked, u32 tp_prior_cwnd)\n{\n    u32 tp_prr_delivered = 28; // Assuming tp->u32 prr_delivered with initial value as 28\n    \n    /* === PARTIAL GOOD SINK ===\n    * The check applies ONLY when:\n    * newly_acked_sacked > 0 and tp_prior_cwnd is non-zero\n    */\n    if (newly_acked_sacked > 0 && !WARN_ON_ONCE(!tp_prior_cwnd)) {\n        tp_prr_delivered += newly_acked_sacked;\n        int tp_snd_ssthresh = 50; // Assuming (u64)tp->snd_ssthresh is a concrete value of 50\n        // if (delta < 0) { // considering delta < 0\n        u64 dividend = tp_snd_ssthresh * tp_prr_delivered +\n                       tp_prior_cwnd - 1;\n        // }\n        return dividend;\n    }\n\n    /* === OUTSIDE SAFE RANGE ===\n    * No division performed to avoid crashes, \n    * but also no real \"fix\". Just return a fallback.\n    */\n    return 0; // or another constant fallback\n}\n\nint main(){\n return 0;\n}"
+}
+```
+
+In Patch 2, I've provided safe, non-zero values for `newly_acked_sacked` and `tp_prior_cwnd` directly as part of the "Good source" strategy. In Patch 3, the "Partial good sink" provides conditional safeguards for divisions that occur only for certain ranges of the inputs, ensuring that behavior is safe for values within that range. Outside those values, it returns a fallback value.
+System fingerprint: fp_a4d13246c5

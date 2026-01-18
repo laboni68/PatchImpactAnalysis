@@ -1,0 +1,29 @@
+reply: Let's generate Patch 2 (Good Source) and Patch 3 (Bad Source Partial Good Sink) for the provided original code snippet. Here's how they would look following the pattern established by your examples:
+
+```json
+{
+  "Example 3": 
+  {
+    "CWE": "CWE-369-Divide-By-Zero",
+    "Project": "Custom Project",
+    "Patch Information": "Juliet Dataset style patch generation",
+
+    "Original Code snippet": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define XFACE_MAX_DIGITS 704\n#define XFACE_BITSPERWORD 8\n#define XFACE_WIDTH  48\n#define XFACE_HEIGHT 48\n#define XFACE_PIXELS (XFACE_WIDTH * XFACE_HEIGHT)\n#define XFACE_WORDCARRY (1 << XFACE_BITSPERWORD)\n#define XFACE_WORDMASK (XFACE_WORDCARRY - 1)\n#define XFACE_MAX_WORDS ((XFACE_PIXELS * 2 + XFACE_BITSPERWORD - 1) / XFACE_BITSPERWORD)\n\nint xface_decode_frame_Snippet(int k, int nb_words){\n     if (++k > XFACE_MAX_DIGITS) {\n        return -1;\n     }\n     if (nb_words >= XFACE_MAX_WORDS)  //taken from xface_encode_frame\n        return -1;\n    return 0;\n}\n\n\nint main(){\n int k, nb_words;\n scanf(\"%d %d\", &k, &nb_words);\n printf(\"%d\\n\", xface_decode_frame_Snippet(k, nb_words));\n return 0;\n}",
+
+    "Patch 1 (Good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define XFACE_MAX_DIGITS 666\n#define XFACE_BITSPERWORD 8\n#define XFACE_WORDCARRY (1 << XFACE_BITSPERWORD)\n#define XFACE_WORDMASK (XFACE_WORDCARRY - 1)\n#define XFACE_MAX_WORDS 546\n\nint xface_decode_frame_Snippet(int k, int nb_words){\n     if (++k > XFACE_MAX_DIGITS) {\n        return -1;\n     }\n    if (nb_words >= XFACE_MAX_WORDS) //taken from xface_encode_frame\n        return -1;\n    return 0;\n}\n\nint main(){\n int k, nb_words;\n scanf(\"%d %d\", &k, &nb_words);\n printf(\"%d\\n\", xface_decode_frame_Snippet(k, nb_words));\n return 0;\n}",
+
+    "Patch 2 (Good source)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define XFACE_MAX_DIGITS 666\n#define XFACE_BITSPERWORD 8\n#define XFACE_WORDCARRY (1 << XFACE_BITSPERWORD)\n#define XFACE_WORDMASK (XFACE_WORDCARRY - 1)\n#define XFACE_MAX_WORDS 546\n\nint xface_decode_frame_Snippet(int k, int nb_words){\n     /* GOOD SOURCE: Assign safe values */\n     k = 0;         // Initializing to a safe value\n     nb_words = 0;  // Initializing to a safe value\n\n     if (++k > XFACE_MAX_DIGITS) {\n        return -1;\n     }\n     if (nb_words >= XFACE_MAX_WORDS) {\n        return -1;\n     }\n    return 0;\n}\n\nint main(){\n int k, nb_words;\n printf(\"%d\\n\", xface_decode_frame_Snippet(k, nb_words));\n return 0;\n}",
+
+    "Patch 3 (Bad source Partial good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define XFACE_MAX_DIGITS 666\n#define XFACE_BITSPERWORD 8\n#define XFACE_WORDCARRY (1 << XFACE_BITSPERWORD)\n#define XFACE_WORDMASK (XFACE_WORDCARRY - 1)\n#define XFACE_MAX_WORDS 546\n\nint xface_decode_frame_Snippet(int k, int nb_words){\n     /* BAD SOURCE: Allow k to be manipulated and potentially unsafe */\n     /* PARTIAL GOOD SINK: Logic applied in certain safe and valid situations */\n\n     if (k == 0 && nb_words <= XFACE_MAX_WORDS) {\n         if (++k > XFACE_MAX_DIGITS) {\n            return -1;\n         }\n         if (nb_words >= 0 && nb_words < XFACE_MAX_WORDS) {\n            return 0;\n         }\n     }\n\n    /* OUTSIDE SAFE RANGE */\n    return 0;   // or another constant fallback\n}\n\nint main(){\n int k, nb_words;\n scanf(\"%d %d\", &k, &nb_words);\n printf(\"%d\\n\", xface_decode_frame_Snippet(k, nb_words));\n return 0;\n}"
+  }
+}
+```
+
+### Explanation
+- **Patch 2 (Good Source):**
+  - It initializes `k` and `nb_words` with safe default values to avoid potential vulnerabilities.
+  
+- **Patch 3 (Bad Source Partial Good Sink):**
+  - It allows the input of `k` and `nb_words` but applies a safety check for valid and safe values only within a defined range.
+  - The rest of the range results are controlled with a constant fallback output to ensure safety.
+System fingerprint: fp_a4d13246c5

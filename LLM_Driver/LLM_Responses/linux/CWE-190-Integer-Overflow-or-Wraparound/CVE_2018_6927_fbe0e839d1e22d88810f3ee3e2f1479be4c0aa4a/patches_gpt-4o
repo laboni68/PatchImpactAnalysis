@@ -1,0 +1,29 @@
+reply: Based on the provided template and example, here are the generated Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) for the given code snippet:
+
+```json
+{
+    "Example 3":
+    {
+        "CWE": "CWE-369-Divide-By-Zero",
+        "CVE": "CVE-XXXX-XXXX",
+        "Project": "linux_kernel",
+        "Patch Information": "Juliet Dataset style patch generation",
+        "Original Code snippet":
+        "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n \n#define EINVAL 22\n\nint futex_requeue_Snippet(int nr_wake, int nr_requeue, int requeue_pi)\n{\n\tif (requeue_pi) {\n\t\tif (nr_wake != 1)\n\t\t\treturn -EINVAL;\n\t}\n    return nr_requeue;\n}\nint main(){\n return 0;\n}",
+
+        "Patch 1 (Good sink)":
+        "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define EINVAL 22\n\nint futex_requeue_Snippet(int nr_wake, int nr_requeue, int requeue_pi)\n{\n\n\tif (nr_wake < 0 || nr_requeue < 0)\n\t\treturn -EINVAL;\n\n\tif (requeue_pi) {\n\t\tif (nr_wake != 1)\n\t\t\treturn -EINVAL;\n\t}\n    return nr_requeue;\n}\nint main(){\n return 0;\n}",
+
+        "Patch 2 (Good source)":
+        "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define EINVAL 22\n\nint futex_requeue_Snippet(int nr_wake, int nr_requeue, int requeue_pi)\n{\n\t/* === GOOD SOURCE ONLY === */\n\t/* Assign safe, positive values to nr_wake and nr_requeue */\n\tnr_wake = 1;         // Safe value\n\tnr_requeue = 10;     // Safe value\n\n\tif (requeue_pi) {\n\t\tif (nr_wake != 1)\n\t\t\treturn -EINVAL;\n\t}\n    return nr_requeue;\n}\nint main(){\n return 0;\n}",
+
+        "Patch 3 (Bad source Partial good sink)":
+        "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define EINVAL 22\n\nint futex_requeue_Snippet(int nr_wake, int nr_requeue, int requeue_pi)\n{\n\t/* === PARTIAL GOOD SINK ===\n\t * Apply check only for a valid range of nr_requeue:\n\t *    1 <= nr_wake <= 5\n\t *    1 <= nr_requeue <= 10\n\t */\n\n\tif (nr_wake >= 1 && nr_wake <= 5 && nr_requeue >= 1 && nr_requeue <= 10) {\n\t\t/* Safe range */\n\t\tif (requeue_pi && nr_wake != 1)\n\t\t\treturn -EINVAL;\n\t\treturn nr_requeue;\n\t}\n\n\t/* === OUTSIDE SAFE RANGE ===\n\t * No division or other potentially unsafe operations.\n\t * Just return a fallback value.\n\t */\n\treturn 0;   // or another constant fallback\n}\nint main(){\n return 0;\n}"
+    }
+}
+```
+
+These patches have been created following the patterns of the Juliet Dataset style: 
+- **Patch 2 (Good source)** uses safe initial values for the parameters, ensuring no division-by-zero or invalid negative values can occur.
+- **Patch 3 (Bad source Partial good sink)** applies the fix only when the parameters are within a specified safe range while returning a default fallback outside this range.
+System fingerprint: fp_37d212baff

@@ -1,0 +1,19 @@
+reply: Certainly! Please find the generated Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) below, following the provided format:
+
+```json
+{
+  "Original Code snippet": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \nstatic int __get_data_block_Snippet(unsigned int m_len, unsigned i_blkbits)\n{\n\tsize_t b_size;\n\tb_size = m_len << i_blkbits;\n\treturn b_size;\n}\nint main(){\n return 0;\n}",
+  
+  "Patch 1 (Good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\nstatic int __get_data_block_Snippet(unsigned int m_len, unsigned i_blkbits)\n{\n\tsize_t b_size;\n\t// map.m_len = b_size >> i_blkbits;\n\tb_size = (uint64_t)m_len << i_blkbits;\n\treturn b_size;\n}\n\nint main(){\n return 0;\n}",
+
+  "Patch 2 (Good source)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\nstatic int __get_data_block_Snippet(unsigned int m_len, unsigned i_blkbits)\n{\n\t/* === GOOD SOURCE ONLY === */\n\t/* Assign safe default values to m_len and i_blkbits to avoid overflow */\n\tm_len = 1;  // Safe, small default size to avoid overflow\n\ti_blkbits = 8;  // Safe shift value ensuring no overflow\n\n\tsize_t b_size = m_len << i_blkbits;\n\treturn b_size;\n}\n\nint main(){\n return 0;\n}",
+
+  "Patch 3 (Bad source Partial good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\nstatic int __get_data_block_Snippet(unsigned int m_len, unsigned i_blkbits)\n{\n\t/* === PARTIAL GOOD SINK === */\n\t/* Fix applies ONLY when:\n\t *       0 < i_blkbits < 10\n\t * This limits the shift to avoid overflow for typical scenarios.\n\t */\n\tif (i_blkbits > 0 && i_blkbits < 10) {\n\t    size_t b_size = m_len << i_blkbits;  // Safe operation\n\t    return b_size;\n\t}\n\n\t/* === OUTSIDE SAFE RANGE ===\n\t * No shift is performed to avoid crashes,\n\t * but also no real \"fix\". Just return a fallback.\n\t */\n\n\treturn 0;   // or another constant fallback\n}\n\nint main(){\n return 0;\n}"
+}
+```
+
+### Explanations:
+- **Patch 2 (Good Source):** Ensures the inputs are within safe, predefined ranges to avoid any issues like overflow when these are used in operations without further checks.
+  
+- **Patch 3 (Bad source Partial good sink):** Places constraints on the shift operation that ensure it is safe under certain conditions, while still potentially unsafe in other scenarios, as it only addresses specific cases where the operation can proceed without problems.
+System fingerprint: fp_37d212baff

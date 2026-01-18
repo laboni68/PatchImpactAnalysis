@@ -1,0 +1,89 @@
+reply: Based on the provided JSON template and considering the original and patched code snippets, here are the generated Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) for the given original code snippet:
+
+```json
+{
+    "Example 3": {
+        "CWE": "CWE-369-Divide-By-Zero",
+        "CVE": "CVE-2023-XXXX-XXXXXXXXXXXXX",
+        "Project": "example_project",
+        "Patch Information": "Juliet Dataset style patch generation",
+        "Original Code snippet" :
+        "#include<stdio.h>\n\
+#include<stdint.h>\n\
+#include<limits.h> \n\
+uint64_t cveSnippet(uint64_t max_len, uint64_t curr_size){\n\
+    return max_len+curr_size;\n\
+}\n\
+\n\
+int main(){\n\
+ return 0;\n\
+}",
+
+        "Patch 1 (Good sink)":
+        "#include<stdio.h>\n\
+#include<stdint.h>\n\
+#include<limits.h> \n\
+\n\
+size_t cveSnippet(size_t max_len, size_t curr_size){\n\
+    return max_len+curr_size;\n\
+}\n\
+\n\
+int main(){\n\
+ return 0;\n\
+}",
+
+        "Patch 2 (Good source)":
+        "#include<stdio.h>\n\
+#include<stdint.h>\n\
+#include<limits.h> \n\
+\n\
+uint64_t cveSnippet(uint64_t max_len, uint64_t curr_size){\n\
+    /* === GOOD SOURCE ONLY === */\n\
+    /* Assign safe values to max_len and curr_size that \n\
+    * avoid overflow or other vulnerabilities.\n\
+    */\n\
+    max_len = 1024;\n\
+    curr_size = 512;\n\
+\n\
+    return max_len + curr_size;\n\
+}\n\
+\n\
+int main(){\n\
+ return 0;\n\
+}",
+
+        "Patch 3 (Bad source Partial good sink)":
+        "#include<stdio.h>\n\
+#include<stdint.h>\n\
+#include<limits.h> \n\
+\n\
+uint64_t cveSnippet(uint64_t max_len, uint64_t curr_size){\n\
+    /* === PARTIAL GOOD SINK === */\n\
+    /* Fix applies ONLY when:\n\
+    *        max_len < 1000 and curr_size < 1000\n\
+    * This avoids overflow, but only within a limited range.\n\
+    */\n\
+    if (max_len < 1000 && curr_size < 1000) {\n\
+        /* Safe range */\n\
+        return max_len + curr_size;\n\
+    }\n\
+\n\
+    /* === OUTSIDE SAFE RANGE ===\n\
+    * Return a fallback to avoid potential overflow\n\
+    */\n\
+    return UINT64_MAX;   // or another constant fallback\n\
+}\n\
+\n\
+int main(){\n\
+ return 0;\n\
+}"
+    }
+}
+```
+
+**Patch 2 (Good source)**:
+- Assigns safe, hard-coded values to variables in order to ensure they remain within expected operational parameters.
+
+**Patch 3 (Bad source Partial good sink)**:
+- Introduces a limited safety check, allowing for valid behavior under specific conditions while still providing a mechanism to handle out-of-bounds values with a fallback.
+System fingerprint: fp_37d212baff

@@ -1,0 +1,63 @@
+reply: Certainly! Below are the generated patches for Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) following the template provided.
+
+### Patch 2 (Good source)
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h>
+
+struct iovec {
+    size_t iov_len;
+};
+
+/* === GOOD SOURCE ONLY === */
+int safe_division_Snippet(int a, int b) {
+    /* Assign safe non-zero values */
+    a = 1;
+    b = 2;
+  
+    int result = b / a;
+    return result;
+}
+
+int main(){
+    return 0;
+}
+```
+
+### Patch 3 (Bad source Partial good sink)
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h>
+
+struct iovec {
+    size_t iov_len;
+};
+
+/* === PARTIAL GOOD SINK ===
+* Fix applies ONLY when:
+*1 < a < 50 and b > a
+*/
+int partial_safe_division_Snippet(int a, int b) {
+    if (a > 1 && a < 50 && b > a) {
+        /* Safe range */
+        return b / a;
+    }
+
+    /* === OUTSIDE SAFE RANGE ===
+    * No division performed to avoid crashes,
+    * but also no real "fix". Just return a fallback.
+    */
+    return 0;   // or another constant fallback
+}
+
+int main(){
+    return 0;
+}
+```
+
+Make sure to adjust the context and comments based on the actual code specifics you have if different from this structured example.
+System fingerprint: fp_37d212baff

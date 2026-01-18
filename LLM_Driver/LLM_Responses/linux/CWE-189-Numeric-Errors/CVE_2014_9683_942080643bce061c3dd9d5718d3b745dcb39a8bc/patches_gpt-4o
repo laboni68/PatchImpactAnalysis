@@ -1,0 +1,25 @@
+reply: Sure, I'll generate Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) for the unspecified original code snippet using the Juliet Dataset style of patch generation.
+
+```json
+{
+    "Example 3": {
+        "CWE": "CWE-369-Divide-By-Zero",
+        "CVE": "CVE-YYYY-XXXX",
+        "Project": "your_project",
+        "Patch Information": "Juliet Dataset style patch generation",
+        "Original Code snippet": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\nint main(){\n return 0;\n}",
+
+        "Patch 1 (Good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\nint main(){\n return 0;\n}",
+
+        "Patch 2 (Good source)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\nint some_function(int value) {\n    /* === GOOD SOURCE ONLY === */\n    /* Assign a safe, non-zero value to value */\n    value = 42;\n\n    /* Assume some computation using the safe source */\n    int result = 100 / value;\n    \n    return result;\n}\n\nint main(){\n    int safe_value = 0; // Will be overwritten in some_function\n    int result = some_function(safe_value);\n    printf(\"Result: %d\\n\", result);\n    return 0;\n}",
+
+        "Patch 3 (Bad source Partial good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\nint some_function(int value) {\n    /* === PARTIAL GOOD SINK === */\n    /* Fix applies ONLY when value is positive and below a certain threshold */\n    if (value > 0 && value < 50) {\n        /* Safe range */\n        int result = 100 / value;\n        return result;\n    }\n\n    /* === OUTSIDE SAFE RANGE ===\n    * No division performed to avoid crashes,\n    * but also no real \"fix\". Just return a fallback.\n    */\n    return 0;   // or another constant fallback\n}\n\nint main(){\n    int unsafe_value = -1; // Unsafe source\n    int result = some_function(unsafe_value);\n    printf(\"Result: %d\\n\", result);\n    return 0;\n}"
+    }
+}
+```
+
+### Explanation:
+- **Patch 2 (Good source):** A safe, non-zero constant value is assigned to `value` to avoid triggering a divide-by-zero issue.
+
+- **Patch 3 (Bad source Partial good sink):** This patch introduces a conditional check where operations are only performed if `value` is within a certain safe range, avoiding division by zero but still not completely handling the general case where `value` might be outside this range. A fallback result is returned for values outside the safe range.
+System fingerprint: fp_37d212baff

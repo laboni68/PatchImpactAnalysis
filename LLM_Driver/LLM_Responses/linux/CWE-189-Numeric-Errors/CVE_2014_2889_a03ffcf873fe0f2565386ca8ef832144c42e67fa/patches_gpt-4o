@@ -1,0 +1,31 @@
+reply: Certainly! Let's generate Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) for the given scenario.
+
+### Example 3
+
+```json
+{
+    "CWE": "CWE-369-Divide-By-Zero",
+    "Project": "Your Project Name",
+    "Patch Information": "Juliet Dataset style patch generation",
+    "Original Code snippet": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n#include<stdbool.h>\n\nstatic inline bool is_near(int offset)\n{\n\treturn offset <= 127 && offset >= -128;\n}\n\nint bpf_jit_compile_Snippet(int t_offset, int f_offset){\n    // if (filter[i].jt != 0) {\n\t//\t\t\t\tif (filter[i].jf && f_offset)\n\t\tt_offset += is_near(f_offset) ? 2 : 6;\n        return t_offset;\n}\nint main(){\n return 0;\n}",
+    
+    "Patch 1 (Good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n#include<stdbool.h>\n\nstatic inline bool is_near(int offset)\n{\n\treturn offset <= 127 && offset >= -128;\n}\n\nint bpf_jit_compile_Snippet(int t_offset, int f_offset){\n    // if (filter[i].jt != 0) {\n\t//\t\t\t\tif (filter[i].jf && f_offset)\n\t\tt_offset += is_near(f_offset) ? 2 : 5;\n        return t_offset;\n}\n\nint main(){\n return 0;\n}",
+    
+    "Patch 2 (Good source)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n#include<stdbool.h>\n\nstatic inline bool is_near(int offset)\n{\n\treturn offset <= 127 && offset >= -128;\n}\n\nint bpf_jit_compile_Snippet(int t_offset, int f_offset){\n    int ret = t_offset;\n\n    /* === GOOD SOURCE ONLY === */\n    f_offset = 0;   // Safe, non-zero default to prevent adjustment to large values\n\n    /* === BAD SINK === */\n    ret += is_near(f_offset) ? 2 : 6;\n\n    return ret;\n}\n\nint main(){\n return 0;\n}",
+    
+    "Patch 3 (Bad source Partial good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n#include<stdbool.h>\n\nstatic inline bool is_near(int offset)\n{\n\treturn offset <= 127 && offset >= -128;\n}\n\nint bpf_jit_compile_Snippet(int t_offset, int f_offset){\n\n    /* === PARTIAL GOOD SINK === */\n    /* Fix applies ONLY when:\n     *\tf_offset within the \"near\" range \n     *\tAND not too large to cause overflow\n     * This partially avoids incorrect behavior but may not cover all cases.\n     */\n    if (is_near(f_offset)) {\n        /* Safe range */\n        t_offset += 2;\n    } else if (f_offset > 128 && f_offset < 256) {\n        /* Safe computation for specified range */\n        t_offset += 6;\n    }\n    \n    /* === OUTSIDE SAFE RANGE ===\n    * No adjustment to avoid misbehavior,\n    * returning the original offset.\n    */\n    return t_offset;\n}\n\nint main(){\n return 0;\n}"
+}
+```
+
+### Explanation
+
+1. **Patch 2 (Good Source)**:
+   - In this patch, we define a safe, predetermined value for `f_offset` to avoid problematic operations.
+   - The sink remains the same, with the assumption that the source input is always safe.
+
+2. **Patch 3 (Bad Source Partial Good Sink)**:
+   - This patch introduces a partial fix by limiting the cases where the operation is considered safe.
+   - An additional conditional check enforces a "safe range" for `f_offset` values, mitigating the risk of incorrect adjustments without altering inputs outside the considered "safe" range.
+
+These patches follow the general pattern established by your examples, focusing on control over the source and alterations to handling in the sink based on certain safe conditions.
+System fingerprint: fp_ed643dde95

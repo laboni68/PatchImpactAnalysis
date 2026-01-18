@@ -1,0 +1,34 @@
+reply: Certainly! Based on the original code snippet and the provided example format, here are the requested patches:
+
+```json
+{
+    "Example 3": {
+        "CWE": "CWE-369-Divide-By-Zero",
+        "CVE": "CVE-2024-XXXXXX",
+        "Project": "custom",
+        "Patch Information": "Juliet Dataset style patch generation",
+        
+        "Original Code snippet": 
+        "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\nint round_up(int n, unsigned int d){\n    return (((n) + (d) - 1) & -(d));\n}\n\nint main(){\n for (int i = -100; i < 10; i++){\n      for (int j = 0; j < 100; j++){\n         printf(\"%d \", round_up(i, j));\n      }\n   }\n return 0;\n}",
+        
+        "Patch 1 (Good sink)": 
+        "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\nint round_up(int n, unsigned int d){\n   return  (((n) + (d) - 1) & -(0 ? (n) : (d)));\n}\n\nint main(){\n   for (int i = -100; i < 10; i++){\n      for (int j = 0; j < 100; j++){\n         printf(\"%d \", round_up(i, j));\n      }\n   }\n   //  printf(\"%d\\n\", round_up(10, -3));\n return 0;\n}",
+        
+        "Patch 2 (Good source)": 
+        "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\nint round_up(int n, unsigned int d){\n    return (((n) + (d) - 1) & -(d));\n}\n\nint main(){\n   for (int i = -100; i < 10; i++){\n        for (int j = 1; j < 100; j++) { // SAFE SOURCE: j starts from 1 to avoid zero\n            printf(\"%d \", round_up(i, j));\n        }\n   }\n return 0;\n}",
+        
+        "Patch 3 (Bad source Partial good sink)": 
+        "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\nint round_up(int n, unsigned int d){\n    // === PARTIAL GOOD SINK ===\n    // Fix applies ONLY when d is between 1 and 10\n    if (d >= 1 && d <= 10) {\n        return (((n) + (d) - 1) & -(d));\n    }\n\n    // === OUTSIDE SAFE RANGE ===\n    // No operation to avoid undefined behavior\n    return n; // or another fallback behavior\n}\n\nint main(){\n   for (int i = -100; i < 10; i++){\n      for (int j = 0; j < 100; j++){\n         printf(\"%d \", round_up(i, j));\n      }\n   }\n return 0;\n}"
+    }
+}
+```
+
+### Summary of Patches:
+
+- **Patch 2 (Good Source)**:
+  - The inner loop for `j` starts from `1` instead of `0` to prevent a zero divisor, ensuring `d` is always non-zero.
+  
+- **Patch 3 (Bad Source Partial Good Sink)**:
+  - Adds a partial fix where the function `round_up` safely operates only for `d` between 1 and 10.
+  - For values of `d` outside this range, no computation is attempted to prevent division by zero, and the function returns `n` as a fallback.
+System fingerprint: fp_37d212baff

@@ -1,0 +1,25 @@
+reply: Here are the generated patches based on the given JSON template and the original code snippet provided:
+
+```json
+{
+    "Example 3":
+    {
+        "CWE": "CWE-369-Divide-By-Zero",
+        "CVE": "CVE-XXXX-XXXX",
+        "Project": "example_project",
+        "Patch Information": "Juliet Dataset style patch generation",
+        "Original Code snippet": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n#define MKTAG(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | ((unsigned)(d) << 24))\n#define FFERRTAG(a, b, c, d) (-(int)MKTAG(a, b, c, d))\n#define AVERROR_INVALIDDATA        FFERRTAG( 'I','N','D','A') ///< Invalid data found when processing input\n\nstatic int add_doubles_metadata_Snippet(int count){\n    printf(\"count: %d\\n\", count);\n     if (count >= INT_MAX / sizeof(int64_t)){\n     printf(\"count: %d\\n\", count);\n        return AVERROR_INVALIDDATA;}\n    return count * sizeof(int64_t);\n}\nint main(){\n     int count;\n    scanf(\"%d\", &count);\n    printf(\"%d\\n\", add_doubles_metadata_Snippet(count));\n return 0;\n}\n",
+        
+        "Patch 1 (Good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\n#define MKTAG(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | ((unsigned)(d) << 24))\n#define FFERRTAG(a, b, c, d) (-(int)MKTAG(a, b, c, d))\n#define AVERROR_INVALIDDATA        FFERRTAG( 'I','N','D','A') ///< Invalid data found when processing input\n\nstatic int add_doubles_metadata_Snippet(int count){\n     if (count >= INT_MAX / sizeof(int64_t) || count <= 0)\n        return AVERROR_INVALIDDATA;\n    return count * sizeof(int64_t);\n}\nint main(){\n    int count;\n    scanf(\"%d\", &count);\n    printf(\"%d\\n\", add_doubles_metadata_Snippet(count));\n return 0;\n}\n",
+
+        "Patch 2 (Good source)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\n#define MKTAG(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | ((unsigned)(d) << 24))\n#define FFERRTAG(a, b, c, d) (-(int)MKTAG(a, b, c, d))\n#define AVERROR_INVALIDDATA        FFERRTAG( 'I','N','D','A') ///< Invalid data found when processing input\n\nstatic int add_doubles_metadata_Snippet(int count){\n    /* === GOOD SOURCE ONLY === */\n    count = 1;   // Assign a safe, positive value to count\n\n    /* === BAD SINK (NO CHECKS) === */\n    /* Still vulnerable if modified to zero, but our source is safe */\n    return count * sizeof(int64_t);\n}\nint main(){\n    int count;\n    count = 1; // Assign safe value directly in main as well\n    printf(\"%d\\n\", add_doubles_metadata_Snippet(count));\n return 0;\n}\n",
+
+        "Patch 3 (Bad source Partial good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\n#define MKTAG(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | ((unsigned)(d) << 24))\n#define FFERRTAG(a, b, c, d) (-(int)MKTAG(a, b, c, d))\n#define AVERROR_INVALIDDATA        FFERRTAG( 'I','N','D','A') ///< Invalid data found when processing input\n\nstatic int add_doubles_metadata_Snippet(int count){\n    /* === PARTIAL GOOD SINK ===\n    * Fix applies ONLY when:\n    *     1 <= count <= 10\n    * This avoids overflow, but only for the limited range.\n    */\n    if (count > 0 && count <= 10) {\n        /* Safe range */\n        return count * sizeof(int64_t);\n    }\n\n    /* === OUTSIDE SAFE RANGE ===\n    * No multiplication performed to avoid crashes,\n    * but also no real \"fix\". Just return a fallback.\n    */\n    return AVERROR_INVALIDDATA;   // or another constant fallback\n}\nint main(){\n    int count;\n    scanf(\"%d\", &count);\n    printf(\"%d\\n\", add_doubles_metadata_Snippet(count));\n return 0;\n}\n"
+    }
+}
+```
+
+### Explanation:
+- **Patch 2 (Good source)**: Sets a safe, non-zero, and non-negative value to `count` within the function itself to ensure there's no division-by-zero or overflow risk at the source level.
+- **Patch 3 (Bad source Partial good sink)**: Applies a sink-side validation that only allows calculation when `count` is between 1 and 10. The source remains unmodified, so risks exist outside this range.
+System fingerprint: fp_a4d13246c5

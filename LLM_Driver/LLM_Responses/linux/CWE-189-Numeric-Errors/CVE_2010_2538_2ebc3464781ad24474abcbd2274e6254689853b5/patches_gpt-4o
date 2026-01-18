@@ -1,0 +1,76 @@
+reply: Based on the provided JSON template from the Juliet Dataset style patch generation and the given original code snippet, I will generate Patch 2 (Good Source) and Patch 3 (Bad Source Partial Good Sink) following the structure and coding patterns shown in the examples.
+
+### Patch 2 (Good Source)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h>
+
+#define EINVAL          22      /* Invalid argument */
+#define u64 uint64_t
+
+u64 btrfs_ioctl_clone_Snippet(u64 off, u64 olen, u64 src_i_size){
+    int ret = 0;
+    u64 len = olen;
+
+    /* === GOOD SOURCE ONLY === */
+    /* Assign a safe, valid range for off and olen */
+    off = 0;       // Start from the beginning
+    olen = (src_i_size > 0) ? src_i_size : 1; // safe range avoiding divide by zero
+
+    /* Safe operation based on good source values */
+    if (len == 0)
+        olen = len = src_i_size - off;
+    return olen;
+}
+
+int main(){
+    return 0;
+}
+```
+
+### Patch 3 (Bad Source Partial Good Sink)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h>
+
+#define EINVAL          22      /* Invalid argument */
+#define u64 uint64_t
+
+u64 btrfs_ioctl_clone_Snippet(u64 off, u64 olen, u64 src_i_size){
+    int ret;
+    u64 len = olen;
+
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when a specific condition is met:
+    *       off < src_i_size && (src_i_size - off) >= 10
+    * This allows a safe range of len calculation.
+    */
+
+    if (off < src_i_size && (src_i_size - off) >= 10) {
+        /* Safe range */
+        if (len == 0)
+            olen = len = src_i_size - off;
+        
+        return olen;
+    }
+
+    /* === OUTSIDE SAFE RANGE ===
+    * No cloning performed to avoid errors,
+    * but also no real "fix". Just return a default error.
+    */
+    ret = -EINVAL;
+    return ret;   // return error code
+}
+
+int main(){
+    return 0;
+}
+```
+
+In these patches:
+- **Patch 2 (Good Source):** I've provided safe default values for `off` and `olen`, assuming a valid range that guarantees no boundary violations. This prevents any errors from occurring due to an initially defective source configuration.
+  
+- **Patch 3 (Bad Source Partial Good Sink):** I've implemented a partial fix by ensuring that the operations are performed only when `off` is less than `src_i_size` and the resulting length is at least a known minimum value for safety. Outside of this range, it falls back to returning a standard error.
+System fingerprint: fp_37d212baff
