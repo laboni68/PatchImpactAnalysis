@@ -1,0 +1,75 @@
+reply: Certainly! Based on the JSON template you've provided and given the original code snippet as well as the Patch 1 (Good sink), I will generate Patch 2 (Good source) and Patch 3 (Bad source Partial good sink). 
+
+Let's start with the given information:
+
+### Original Code Snippet
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+int main(){
+    return 0;
+}
+```
+
+### Patch 1 (Good sink)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+int main(){
+    return 0;
+}
+```
+
+### Patch 2 (Good Source)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int main(){
+    /* === GOOD SOURCE ONLY === */
+    /* Assign safe, non-zero values */
+    int example_value = 1;  // Example of setting a safe value
+    int safe_divisor = 2;
+
+    /* Some calculations using the safe values */
+    int result = example_value / safe_divisor;
+    printf("Result: %d\n", result);
+
+    return 0;
+}
+```
+
+### Patch 3 (Bad Source Partial Good Sink)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int main(){
+    /* === BAD SOURCE === */
+    int example_value = 0;  // Dangerous value; could lead to divide-by-zero
+
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when:
+    * example_value between 1 and 10
+    */
+    if (example_value > 0 && example_value <= 10) {
+        /* Safe to use */
+        int safe_result = 100 / example_value; // Safe division
+        printf("Safe result: %d\n", safe_result);
+    } else {
+        /* === OUTSIDE SAFE RANGE ===
+        * Avoiding division for safety, still returning a fallback.
+        */
+        printf("Fallback used, no division\n");
+    }
+
+    return 0;
+}
+```
+
+The patches have been created following the Juliet Dataset style to reflect appropriate conditions for good source and partial good sink scenarios. Patch 2 controls the safe initialization of values, while Patch 3 applies a partial good sink logic to handle a limited range safely.
+System fingerprint: fp_ed643dde95

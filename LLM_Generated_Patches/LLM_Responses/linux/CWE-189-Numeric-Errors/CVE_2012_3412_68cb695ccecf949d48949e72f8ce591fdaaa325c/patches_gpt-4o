@@ -1,0 +1,67 @@
+reply: To generate the Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) patches based on the given format, I'll follow the pattern established in the examples you provided.
+
+### Original Code Snippet
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+int main(){
+    return 0;
+}
+```
+
+### Patch 2 (Good source)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int example_function_Snippet(int value) {
+    int result;
+
+    /* === GOOD SOURCE ONLY === */
+    /* Assign a safe, non-zero value to value */
+    value = 1;
+
+    /* Assume some operation that would normally be risky */
+    result = 100 / value;
+
+    return result;
+}
+
+int main(){
+    return 0;
+}
+```
+
+### Patch 3 (Bad source Partial good sink)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int example_function_Snippet(int value) {
+
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when value is between 1 and 10.
+    * This avoids division-by-zero, but only for the limited range.
+    */
+    if (value >= 1 && value <= 10) {
+        /* Safe range */
+        return 100 / value;
+    }
+
+    /* === OUTSIDE SAFE RANGE ===
+    * No division performed to avoid crashes,
+    * but also no real "fix". Just return a fallback.
+    */
+    return 0;   // or another constant fallback
+}
+
+int main(){
+    return 0;
+}
+```
+
+For these patches, I've assumed that the original code involves a potential division operation that could result in a divide-by-zero error if not handled properly by the source or sink logic. Adjust the operations and logic based on the actual functionality of your non-vulnerable original code, if needed.
+System fingerprint: fp_37d212baff

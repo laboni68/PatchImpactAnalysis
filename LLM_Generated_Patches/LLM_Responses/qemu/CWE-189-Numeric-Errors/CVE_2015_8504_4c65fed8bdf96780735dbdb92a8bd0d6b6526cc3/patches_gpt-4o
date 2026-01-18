@@ -1,0 +1,20 @@
+reply: Based on the provided JSON template and format for generating patches, here is Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) for the given original code snippet:
+
+```json
+{
+    "CWE": "CWE-369-Divide-By-Zero",
+    "CVE": "CVE-XXXX-XXXX-XXXX",
+    "Project": "qemu",
+    "Patch Information": "Juliet Dataset style patch generation",
+    "Original Code snippet": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \nint set_pixel_format_Snippet(int red_max){\n  int rmax= red_max;\n  return rmax;\n}\n\nint main(){\n  printf(\"%d\\n\", set_pixel_format_Snippet(1048577));\n return 0;\n}",
+    
+    "Patch 1 (Good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\nint set_pixel_format_Snippet(int red_max){\n  int rmax = red_max ? red_max : 0xFF;\n  return rmax ;\n}\n\nint main(){\n  printf(\"%d\\n\", set_pixel_format_Snippet(1048577));\n return 0;\n}",
+
+    "Patch 2 (Good source)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\nint set_pixel_format_Snippet(int red_max){\n  /* === GOOD SOURCE ONLY === */\n  /* Assign a safe, predefined value to red_max */\n  red_max = 0xFF; // Safe, non-zero source\n\n  int rmax = red_max;\n  return rmax;\n}\n\nint main(){\n  printf(\"%d\\n\", set_pixel_format_Snippet(1048577));\n return 0;\n}",
+
+    "Patch 3 (Bad source Partial good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h> \n\nint set_pixel_format_Snippet(int red_max){\n  /* === PARTIAL GOOD SINK ===\n   * Fix applies ONLY when red_max is within a safe range\n   * This avoids potential issues from problematic values\n   */\n  if (red_max >= 0 && red_max <= 0xFFF) {\n    /* Safe range */\n    return red_max;\n  }\n\n  /* === OUTSIDE SAFE RANGE ===\n   * Just return a fallback safe value if not within safe range.\n   */\n  return 0xFF; // or another default safe value\n}\n\nint main(){\n  printf(\"%d\\n\", set_pixel_format_Snippet(1048577));\n return 0;\n}"
+}
+```
+
+Remember, the provided patches follow the described template: Patch 2 changes the bad source to a good one by assigning a safe, non-zero value, while Patch 3 offers a partial fix by handling specific safe cases and advising fallback options for the unsafe range.
+System fingerprint: fp_37d212baff

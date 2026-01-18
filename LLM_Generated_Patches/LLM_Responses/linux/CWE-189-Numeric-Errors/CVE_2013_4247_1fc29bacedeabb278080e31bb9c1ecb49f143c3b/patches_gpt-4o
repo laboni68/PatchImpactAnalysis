@@ -1,0 +1,113 @@
+reply: Certainly! Below are the Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) following the same pattern and transformation logic used in the examples you provided.
+
+**Original Code Snippet:**
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int build_unc_path_to_root_Snippet(char cifs_sb, unsigned int pplen){
+    char pos;
+    if (pplen) {
+		pos++ = cifs_sb;
+		pos = pos + 1;
+		pos += pplen;
+	}
+    return pos;
+}
+
+int main(){
+ return 0;
+}
+```
+
+**Patch 1 (Good sink):**
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int build_unc_path_to_root_Snippet(char cifs_sb, unsigned int pplen){
+    char pos;
+    if (pplen) {
+		pos = cifs_sb;
+		pos = pos + 1;
+		pos += pplen;
+	}
+    return pos;
+}
+
+int main(){
+ return 0;
+}
+```
+
+### Patch 2 (Good source):
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int build_unc_path_to_root_Snippet(char cifs_sb, unsigned int pplen){
+    char pos;
+
+    /* === GOOD SOURCE ONLY === */
+    /* Assign a safe, non-zero value to pplen */
+    pplen = 1;  // Ensuring non-zero value
+
+    /* === BAD SINK (NO CHECKS) === */
+    /* Vulnerable logic if pplen is zero, but source ensures it is non-zero now */
+    pos++ = cifs_sb;
+    pos = pos + 1;
+    pos += pplen;
+
+    return pos;
+}
+
+int main(){
+ return 0;
+}
+```
+
+### Patch 3 (Bad source Partial good sink):
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int build_unc_path_to_root_Snippet(char cifs_sb, unsigned int pplen){
+    char pos;
+
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when:
+    *     pplen is between 1 and 10
+    * This avoids uninitialized use of 'pos', but only for the limited range.
+    */
+
+    if (pplen > 0 && pplen < 10) {
+        /* Safe range */
+        pos++ = cifs_sb;
+        pos = pos + 1;
+        pos += pplen;
+        return pos;
+    }
+
+    /* === OUTSIDE SAFE RANGE ===
+    * No operation performed to avoid potential issues,
+    * but also no real "fix". Just return a fallback.
+    */
+
+    return 0;   // or another constant fallback
+}
+
+int main(){
+ return 0;
+}
+```
+
+These patches leverage the principles from your given JSON template and address the specific vulnerabilities by either modifying the source or adding specific conditions as required, within their respective contexts.
+System fingerprint: fp_ed643dde95

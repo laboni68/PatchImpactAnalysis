@@ -1,0 +1,90 @@
+reply: To provide Patch 2 (Good Source) and Patch 3 (Bad Source Partial Good Sink) for the original code snippet and based on the JSON template provided, I'll need to prepare the patches assuming a hypothetical code structure similar to the original examples given. Here are the formatted patches:
+
+### Original Code Snippet
+```c
+#include <stdio.h>
+#include <stdint.h>
+#include <limits.h>
+
+int process_values_Snippet(int value1, int value2) {
+    /* === ORIGINAL BUGGY (VULNERABLE) === */
+    if (value2 == 0) {
+        return 0;
+    }
+    return value1 / value2;
+}
+
+int main() {
+    return 0;
+}
+```
+
+### Patch 1 (Good Sink)
+```c
+#include <stdio.h>
+#include <stdint.h>
+#include <limits.h>
+
+int process_values_Snippet(int value1, int value2) {
+    /* === GOOD SINK === */
+    if (value2 == 0 || value1 > INT32_MAX / value2) {
+        return 0;
+    }
+    return value1 / value2;
+}
+
+int main() {
+    return 0;
+}
+```
+
+### Patch 2 (Good Source)
+```c
+#include <stdio.h>
+#include <stdint.h>
+#include <limits.h>
+
+int process_values_Snippet(int value1, int value2) {
+    /* === GOOD SOURCE ONLY === */
+    value1 = 10;  // Assign a safe, non-zero value to value1
+    value2 = 1;   // Assign a safe, non-zero value to value2
+
+    return value1 / value2;
+}
+
+int main() {
+    return 0;
+}
+```
+
+### Patch 3 (Bad Source Partial Good Sink)
+```c
+#include <stdio.h>
+#include <stdint.h>
+#include <limits.h>
+
+int process_values_Snippet(int value1, int value2) {
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when:
+    *     0 < value2 <= 5
+    * This avoids division-by-zero but only for the limited range.
+    */
+    if (value2 > 0 && value2 <= 5) {
+        /* Safe range */
+        return value1 / value2;
+    }
+
+    /* === OUTSIDE SAFE RANGE ===
+    * No division performed to avoid crashes,
+    * but also no real "fix". Just return a fallback.
+    */
+    return 0;   // or another constant fallback
+}
+
+int main() {
+    return 0;
+}
+```
+
+In the patches above, Patch 2 provides a "good source" by ensuring fixed, safe values for variables to prevent division by zero. Patch 3 provides a conditional fix by allowing division only within a specified safe range, returning a fallback outside that range.
+System fingerprint: fp_37d212baff

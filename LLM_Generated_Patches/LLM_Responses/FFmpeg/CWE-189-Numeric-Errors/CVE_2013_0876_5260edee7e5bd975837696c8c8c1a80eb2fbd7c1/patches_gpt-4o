@@ -1,0 +1,69 @@
+reply: To create Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) based on the JSON template provided, we will modify the original code snippet by adjusting the initial values and constraints. Patch 2 will involve setting up a safe, non-vulnerable environment by initializing parameters to safe values. Patch 3 will provide a partial fix by handling a limited safe range and using fallback behavior otherwise.
+
+Here's how you can design these patches:
+
+**Patch 2 (Good source):**
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+static int old_codec37_Snippet(int ctx_height, int top,
+                       int left, int height, int stride, uint32_t decoded_size)
+{
+    /* === GOOD SOURCE ONLY === */
+    /* Set a safe, controlled environment */
+    ctx_height = 10;  // Arbitrary safe values
+    top = 1;
+    left = 1;
+    height = 10;
+    stride = 2;
+    decoded_size = 5;
+
+    if (decoded_size > ctx_height * stride - left - top * stride) {
+        decoded_size = ctx_height * stride - left - top * stride;
+    }
+    return decoded_size;
+}
+
+int main(){
+ return 0;
+}
+```
+
+**Patch 3 (Bad source Partial good sink):**
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+static int old_codec37_Snippet(int ctx_height, int top,
+                       int left, int height, int stride, uint32_t decoded_size)
+{
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies only when height and stride keep decoded_size within safe range
+    */
+
+    if (height > 0 && stride > 0 && decoded_size <= height * stride - left - top * stride) {
+        return decoded_size;
+    }
+
+    /* === OUTSIDE SAFE RANGE ===
+    * Handle cases where conditions don’t meet, returning 0 to avoid potential issues
+    */ 
+    return 0;  // or another fallback constant
+}
+
+int main(){
+ return 0;
+}
+```
+
+In these patches:
+
+- **Patch 2 (Good source)**: The parameters are initialized to safe, non-zero values to prevent any possibility of unsafe behavior or divide-by-zero errors. This ensures that the function operates within a controlled and safe context.
+  
+- **Patch 3 (Bad source Partial good sink)**: The patch introduces partial checks. It allows computations to proceed within a defined and safe value range but otherwise defaults to a safe fallback to avoid potential issues. This provides limited coverage and partial mitigations of potential overflows.
+System fingerprint: fp_a4d13246c5

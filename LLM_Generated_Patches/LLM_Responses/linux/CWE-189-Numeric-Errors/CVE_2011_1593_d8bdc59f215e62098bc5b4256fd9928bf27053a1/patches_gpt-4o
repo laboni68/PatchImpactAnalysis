@@ -1,0 +1,103 @@
+reply: Certainly! Below are Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) based on the given example.
+
+### Patch 2 (Good Source)
+This patch ensures that the variable `filp_f_pos` starts with a safe, predefined value.
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+typedef long long loff_t;
+#define CONFIG_BASE_SMALL 0 // Assuming the value
+#define _AC(X,Y)	X
+#define PAGE_SHIFT	13
+#define PID_MAX_DEFAULT (CONFIG_BASE_SMALL ? 0x1000 : 0x8000)
+#define PAGE_SIZE	(_AC(1,UL) << PAGE_SHIFT)
+/*
+ * A maximum of 4 million PIDs should be enough for a while.
+ * [NOTE: PID/TIDs are limited to 2^29 ~= 500+ million, see futex.h.]
+ */
+#define PID_MAX_LIMIT (CONFIG_BASE_SMALL ? PAGE_SIZE * 8 : \
+	(sizeof(long) > 4 ? 4 * 1024 * 1024 : PID_MAX_DEFAULT))
+/*
+ * Offset of the first process in the /proc root directory..
+ */
+#define FIRST_PROCESS_ENTRY 256
+#define TGID_OFFSET (FIRST_PROCESS_ENTRY + 28) // Assuming ARRAY_SIZE(proc_base_stuff) as 28
+
+unsigned int proc_pid_readdir_Snippet(loff_t filp_f_pos){
+    unsigned int nr;
+
+	/* === GOOD SOURCE ONLY === */
+    /* Assign a safe, valid value to filp_f_pos */
+    filp_f_pos = FIRST_PROCESS_ENTRY + 1;
+
+    nr = filp_f_pos - FIRST_PROCESS_ENTRY;
+    return nr;
+}
+
+int main(){
+    loff_t filp_f_pos;
+    scanf("%lld", &filp_f_pos);
+    printf("%u", proc_pid_readdir_Snippet(filp_f_pos));
+    return 0;
+}
+```
+
+### Patch 3 (Bad source Partial good sink)
+In this patch, a partial check is implemented allowing only `filp_f_pos` values within a specific safe range.
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+typedef long long loff_t;
+#define CONFIG_BASE_SMALL 0 // Assuming the value
+#define _AC(X,Y)	X
+#define PAGE_SHIFT	13
+#define PID_MAX_DEFAULT (CONFIG_BASE_SMALL ? 0x1000 : 0x8000)
+#define PAGE_SIZE	(_AC(1,UL) << PAGE_SHIFT)
+/*
+ * A maximum of 4 million PIDs should be enough for a while.
+ * [NOTE: PID/TIDs are limited to 2^29 ~= 500+ million, see futex.h.]
+ */
+#define PID_MAX_LIMIT (CONFIG_BASE_SMALL ? PAGE_SIZE * 8 : \
+	(sizeof(long) > 4 ? 4 * 1024 * 1024 : PID_MAX_DEFAULT))
+/*
+ * Offset of the first process in the /proc root directory..
+ */
+#define FIRST_PROCESS_ENTRY 256
+#define TGID_OFFSET (FIRST_PROCESS_ENTRY + 28) // Assuming ARRAY_SIZE(proc_base_stuff) as 28
+
+unsigned int proc_pid_readdir_Snippet(loff_t filp_f_pos){
+    unsigned int nr;
+
+    /* === PARTIAL GOOD SINK === */
+    /* Fix applies ONLY when:
+     *   FIRST_PROCESS_ENTRY <= filp_f_pos < FIRST_PROCESS_ENTRY + 100
+     */
+
+    if (filp_f_pos >= FIRST_PROCESS_ENTRY && filp_f_pos < FIRST_PROCESS_ENTRY + 100) {
+        /* Safe range */
+        nr = filp_f_pos - FIRST_PROCESS_ENTRY;
+        return nr;
+    }
+
+    /* === OUTSIDE SAFE RANGE ===
+    * No value adjustment performed, just return a constant as fallback
+    */
+    return 0;   // or another fallback value
+}
+
+int main(){
+    loff_t filp_f_pos;
+    scanf("%lld", &filp_f_pos);
+    printf("%u", proc_pid_readdir_Snippet(filp_f_pos));
+    return 0;
+}
+```
+
+These patches attempt to address potential issues in different ways, as described in your template, while still conforming to the guidelines of patch generation style you've outlined.
+System fingerprint: fp_37d212baff

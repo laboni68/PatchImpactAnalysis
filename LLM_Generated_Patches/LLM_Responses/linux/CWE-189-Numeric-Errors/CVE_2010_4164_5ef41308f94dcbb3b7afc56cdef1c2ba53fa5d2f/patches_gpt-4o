@@ -1,0 +1,96 @@
+reply: To generate Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) based on the provided original code snippet and Patch 1 (Good sink) example, we can proceed as follows:
+
+### Patch 2 (Good source)
+In this patch, the focus will be on providing a good source where the input values are predefined with safe and valid values that avoid any potential vulnerabilities.
+
+```c
+#include <stdio.h>
+#include <stdint.h>
+#include <limits.h>
+
+#define X25_FAC_CLASS_MASK 0xC0
+#define X25_FAC_CLASS_A 0x00
+#define X25_FAC_CLASS_B 0x40
+#define X25_FAC_CLASS_C 0x80
+#define X25_FAC_CLASS_D 0xC0
+
+unsigned int x25_parse_facilities_Snippet(unsigned int len, unsigned char p) {
+    /* === GOOD SOURCE ONLY === */
+    len = 5;  // Safe, non-decreasing value
+    p = X25_FAC_CLASS_B;  // Use valid class directly
+
+    switch (p & X25_FAC_CLASS_MASK) {
+        case X25_FAC_CLASS_A:
+            len -= 2;
+            break;
+        case X25_FAC_CLASS_B:
+            len -= 3;
+            break;
+        case X25_FAC_CLASS_C:
+            len -= 4;
+            break;
+    }
+    return len;
+}
+
+int main() {
+    printf("%d\n", x25_parse_facilities_Snippet(0, 0));  // Values do not matter due to good source
+    return 0;
+}
+```
+
+### Patch 3 (Bad source Partial good sink)
+In this patch, some conditions are checked to ensure safety within a certain range, but it does not extensively handle all cases, leaving some possibilities unprotected.
+
+```c
+#include <stdio.h>
+#include <stdint.h>
+#include <limits.h>
+
+#define X25_FAC_CLASS_MASK 0xC0
+#define X25_FAC_CLASS_A 0x00
+#define X25_FAC_CLASS_B 0x40
+#define X25_FAC_CLASS_C 0x80
+#define X25_FAC_CLASS_D 0xC0
+
+unsigned int x25_parse_facilities_Snippet(unsigned int len, unsigned char p) {
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when:
+    *   len >= 5
+    * This avoids underflow, but only for inputs that satisfy these conditions.
+    */
+    
+    if (len >= 5) {
+        switch (p & X25_FAC_CLASS_MASK) {
+            case X25_FAC_CLASS_A:
+                len -= 2;
+                break;
+            case X25_FAC_CLASS_B:
+                len -= 3;
+                break;
+            case X25_FAC_CLASS_C:
+                len -= 4;
+                break;
+        }
+    } else {
+        /* === OUTSIDE SAFE RANGE ===
+        * No subtraction performed to avoid potential underflows,
+        * but also no real "fix". Just return a fallback.
+        */
+        return len;  // or return 0; for no negative values
+    }
+    return len;
+}
+
+int main() {
+    unsigned int len;
+    scanf("%u", &len);
+    unsigned char p;
+    scanf("%hhu", &p);
+    printf("%d\n", x25_parse_facilities_Snippet(len, p));
+    return 0;
+}
+```
+
+These patches follow the patterns described in the Juliet Dataset style, applying good practices to avoid division by zero and other vulnerabilities within limited or controlled scenarios.
+System fingerprint: fp_37d212baff

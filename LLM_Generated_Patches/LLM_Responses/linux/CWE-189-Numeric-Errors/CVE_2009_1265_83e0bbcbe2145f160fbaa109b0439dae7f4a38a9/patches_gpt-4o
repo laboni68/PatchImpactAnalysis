@@ -1,0 +1,24 @@
+reply: Here's how you can generate Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) using the provided format:
+
+```json
+{
+  "Example 3": {
+    "CWE": "CWE-369-Divide-By-Zero",
+    "CVE": "CVE-2016-XXXX-XXXXX",
+    "Project": "example_project",
+    "Patch Information": "Juliet Dataset style patch generation",
+    "Original Code snippet": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define NR_NETWORK_LEN 15\n#define NR_TRANSPORT_LEN 5\n#define EMSGSIZE 40 /* Message too long */\n\nint rose_sendmsg_Snippet(size_t len) {\n    int size;\n    /* Netrom empty data frame has no meaning : don't send */\n    if (len == 0)\n        return 0;\n\n    size = len + NR_NETWORK_LEN + NR_TRANSPORT_LEN;\n    return size;\n}\n\nint main() {\n   // size_t len;\n   // scanf(\"%zu\", &len);\n   for(size_t i = 65536; i < 65536+65536; i++ ){\n      printf(\"%d \", rose_sendmsg_Snippet(i));\n   }\n   \n    return 0;\n}",
+  
+    "Patch 1 (Good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define NR_NETWORK_LEN 15\n#define NR_TRANSPORT_LEN 5\n#define EMSGSIZE 40 /* Message too long */\n\nint rose_sendmsg_Snippet(size_t len) {\n    int size;\n    /* Netrom empty data frame has no meaning : don't send */\n    if (len == 0)\n        return 0;\n    /* Build a packet - the conventional user limit is 236 bytes. We can\n       do ludicrously large NetROM frames but must not overflow */\n    if (len > 65536)\n        return -EMSGSIZE;\n\n    size = len + NR_NETWORK_LEN + NR_TRANSPORT_LEN;\n    return size;\n}\n\nint main() {\n   // size_t len;\n   // scanf(\"%zu\", &len);\n   for(size_t i = 65536; i < 65536+65536; i++ ){\n      printf(\"%d \", rose_sendmsg_Snippet(i));\n   }\n   \n    return 0;\n}",
+    
+    "Patch 2 (Good source)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define NR_NETWORK_LEN 15\n#define NR_TRANSPORT_LEN 5\n#define EMSGSIZE 40 /* Message too long */\n\nint rose_sendmsg_Snippet(size_t len) {\n    int size;\n    /* === GOOD SOURCE ONLY === */\n    len = 10;  // Assign a safe, small value to len\n\n    size = len + NR_NETWORK_LEN + NR_TRANSPORT_LEN;\n    return size;\n}\n\nint main() {\n   // size_t len;\n   // scanf(\"%zu\", &len);\n   for(size_t i = 65536; i < 65536+65536; i++ ){\n      printf(\"%d \", rose_sendmsg_Snippet(i));\n   }\n   \n    return 0;\n}",
+
+    "Patch 3 (Bad source Partial good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\n#define NR_NETWORK_LEN 15\n#define NR_TRANSPORT_LEN 5\n#define EMSGSIZE 40 /* Message too long */\n\nint rose_sendmsg_Snippet(size_t len) {\n    int size;\n    /* === PARTIAL GOOD SINK ===\n     * Fix applies ONLY when:\n     *     1 < len < 100\n     * This avoids overly large messages, but only for the limited range.\n     */\n    if (len > 1 && len < 100) {\n        /* Safe range */\n        size = len + NR_NETWORK_LEN + NR_TRANSPORT_LEN;\n        return size;\n    }\n\n    /* === OUTSIDE SAFE RANGE ===\n     * Do not send message to avoid potential issues.\n     */\n    return -EMSGSIZE;\n}\n\nint main() {\n   // size_t len;\n   // scanf(\"%zu\", &len);\n   for(size_t i = 65536; i < 65536+65536; i++ ){\n      printf(\"%d \", rose_sendmsg_Snippet(i));\n   }\n   \n    return 0;\n}"
+  }
+}
+```
+
+### Explanation:
+- **Patch 2 (Good source)**: Assigns a known, safe, and small value to `len` to ensure that the logic is safe without needing additional runtime checks.
+- **Patch 3 (Bad source Partial good sink)**: Introduces a partial check that only allows message sizes within a specific safe range (`1 < len < 100`). For values outside this range, the function returns an error code (-EMSGSIZE) without performing any computations.
+System fingerprint: fp_a4d13246c5

@@ -1,0 +1,63 @@
+reply: Based on the provided templates and guidelines from the JSON examples, here's how Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) can be generated:
+
+### Patch 2 (Good Source)
+
+The goal of a good source patch is to modify the source of input so that the operation is inherently safe. This means using safe, non-zero defaults that prevent the divide-by-zero error without needing additional checks in the calculations.
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int example_function_Snippet(int parameter) {
+    /* === GOOD SOURCE ONLY === */
+    /* Assign a safe, non-zero value to parameter */
+    parameter = 1;
+
+    /* Perform computation using the safe parameter */
+    int result = 512 / parameter;
+    
+    return result;
+}
+
+int main(){
+    return 0;
+}
+```
+
+### Patch 3 (Bad Source Partial Good Sink)
+
+This patch adds partial checking to enforce safety over a limited range and assumes that inputs outside this range will not be used in contexts that trigger the vulnerability. If the input is outside the safe range, a default safe value is used.
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+int example_function_Snippet(int parameter) {
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when:
+    *       1 <= parameter <= 50
+    * This avoids division-by-zero but only for the limited range of parameters.
+    */
+
+    if (parameter >= 1 && parameter <= 50) {
+        /* Safe range */
+        return 512 / parameter; 
+    }
+
+    /* === OUTSIDE SAFE RANGE ===
+    * No division performed to avoid crashes,
+    * but also no real "fix". Just return a fallback.
+    */
+
+    return 0;   // or another constant fallback
+}
+
+int main(){
+    return 0;
+}
+```
+
+Both patches attempt to ensure that division by zero does not occur, each addressing the issue in different ways—one through setting safe input values, the other by limiting the range of input values that are considered safe.
+System fingerprint: fp_a4d13246c5

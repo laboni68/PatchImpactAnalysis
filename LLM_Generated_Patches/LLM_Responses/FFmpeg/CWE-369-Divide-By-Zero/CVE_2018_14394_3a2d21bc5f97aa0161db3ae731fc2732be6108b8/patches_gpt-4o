@@ -1,0 +1,112 @@
+reply: Based on the provided JSON template and using the style of patch generation as seen in the examples, here are the generated Patch 2 (Good source) and Patch 3 (Bad source Partial good sink) for the given code snippet. These patches aim to handle the original bug of improper handling of potential zero division under different strategies.
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+#define MKTAG(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | ((unsigned)(d) << 24))
+#define FFERRTAG(a, b, c, d) (-(int)MKTAG(a, b, c, d))
+#define AVERROR_PATCHWELCOME       FFERRTAG( 'P','A','W','E') ///< Not yet implemented in FFmpeg, patches welcome
+#define AV_CODEC_ID_ADPCM_IMA_WAV   0x0069
+#define AV_CODEC_ID_ADPCM_MS        0x0002
+
+// Patch 2 (Good source)
+int ff_mov_write_packet2(int codec_id, int size, int frame_size, long sample_size){
+    unsigned int samples_in_chunk = 0;
+
+    /* === GOOD SOURCE ONLY === */
+    sample_size = 1; // Assign a safe, non-zero value to sample_size
+
+    if (codec_id == AV_CODEC_ID_ADPCM_MS ||
+        codec_id == AV_CODEC_ID_ADPCM_IMA_WAV) {
+        samples_in_chunk = frame_size;
+    } else if (sample_size) {
+        samples_in_chunk = size / sample_size;
+    } else {
+        samples_in_chunk = 1;
+    }
+
+    return samples_in_chunk;
+}
+
+int ff_mov_write_packet(int codec_id, int size, int frame_size, long sample_size){
+    unsigned int samples_in_chunk = 0;
+
+    sample_size = 1; // Assign a safe, non-zero value to sample_size
+
+    if (codec_id == AV_CODEC_ID_ADPCM_MS ||
+        codec_id == AV_CODEC_ID_ADPCM_IMA_WAV) {
+        samples_in_chunk = frame_size;
+    } else if (sample_size) {
+        samples_in_chunk = size / sample_size;
+    } else {
+        samples_in_chunk = 1;
+    }
+
+    return samples_in_chunk;
+}
+
+int main(){
+    return 0;
+}
+
+// Patch 3 (Bad source Partial good sink)
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+#define MKTAG(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | ((unsigned)(d) << 24))
+#define FFERRTAG(a, b, c, d) (-(int)MKTAG(a, b, c, d))
+#define AVERROR_PATCHWELCOME       FFERRTAG( 'P','A','W','E') ///< Not yet implemented in FFmpeg, patches welcome
+#define AV_CODEC_ID_ADPCM_IMA_WAV   0x0069
+#define AV_CODEC_ID_ADPCM_MS        0x0002
+
+int ff_mov_write_packet2(int codec_id, int size, int frame_size, long sample_size){
+    unsigned int samples_in_chunk = 0;
+
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when:
+    *     sample_size between 2 and 100
+    * This avoids division-by-zero, but only for the limited range.
+    */
+
+    if (codec_id == AV_CODEC_ID_ADPCM_MS ||
+        codec_id == AV_CODEC_ID_ADPCM_IMA_WAV) {
+        samples_in_chunk = frame_size;
+    } else if (sample_size >= 2 && sample_size <= 100) {
+        samples_in_chunk = size / sample_size;
+    } else {
+        // Handle outside safe range: prevent division and return fallback
+        return 0; // Fallback for unsafe sample_size
+    }
+
+    return samples_in_chunk;
+}
+
+int ff_mov_write_packet(int codec_id, int size, int frame_size, long sample_size){
+    unsigned int samples_in_chunk = 0;
+
+    if (codec_id == AV_CODEC_ID_ADPCM_MS ||
+        codec_id == AV_CODEC_ID_ADPCM_IMA_WAV) {
+        samples_in_chunk = frame_size;
+    } else if (sample_size >= 2 && sample_size <= 100) {
+        samples_in_chunk = size / sample_size;
+    } else {
+        // Handle outside safe range: prevent division and return fallback
+        return 0; // Fallback for unsafe sample_size
+    }
+
+    return samples_in_chunk;
+}
+
+int main(){
+    return 0;
+}
+```
+
+**Explanation:**
+- **Patch 2 (Good source):** Ensures that `sample_size` is set to 1 at the start, eliminating any possibility of division-by-zero errors. This approach, however, does not address potential misuse of the function in other scenarios that might provide unsafe `sample_size` values.
+  
+- **Patch 3 (Bad source Partial good sink):** Adds checks that limit the use of `sample_size` to values within the range 2 to 100. This provides partial coverage against division by zero, as division is only executed when within this range. If `sample_size` does not satisfy this condition, a fallback behavior is executed, avoiding unsafe division operations.
+System fingerprint: fp_37d212baff

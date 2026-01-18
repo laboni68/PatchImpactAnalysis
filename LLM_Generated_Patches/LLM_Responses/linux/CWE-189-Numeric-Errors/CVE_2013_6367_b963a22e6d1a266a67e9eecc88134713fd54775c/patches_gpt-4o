@@ -1,0 +1,72 @@
+reply: Here are the requested patches following the JSON template for "Good source" and "Bad source Partial good sink" based on the given original code snippet and Patch 1 from the latest example:
+
+### Patch 2 (Good Source)
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+typedef long long ___s64;
+#define s64 ___s64
+
+int apic_get_tmcct_Snippet(int kvm_apic_get_reg_val, s64 apic_lapic_timer_period)
+{
+	s64 ns_dependency;
+	
+	/* === GOOD SOURCE ONLY === */
+	/* Assign safe, non-zero values to inputs */
+	kvm_apic_get_reg_val = 1;
+	apic_lapic_timer_period = 100;
+
+	ns_dependency = apic_lapic_timer_period;
+
+	return 1;
+}
+
+int main(){
+	return 0;
+}
+```
+
+### Patch 3 (Bad Source Partial Good Sink)
+
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+typedef long long ___s64;
+#define s64 ___s64
+
+int apic_get_tmcct_Snippet(int kvm_apic_get_reg_val, s64 apic_lapic_timer_period)
+{
+	s64 ns_dependency;
+
+	/* === PARTIAL GOOD SINK ===
+	* Fix applies ONLY when:
+	*     kvm_apic_get_reg_val > 0 and apic_lapic_timer_period is within safe limits
+	*/
+	if (kvm_apic_get_reg_val > 0 && apic_lapic_timer_period > 0 && apic_lapic_timer_period < INT_MAX)
+	{
+		/* Safe range */
+		ns_dependency = apic_lapic_timer_period;
+		return 1;
+	}
+
+	/* === OUTSIDE SAFE RANGE ===
+	* No computation done to avoid undefined behavior,
+	* but also no real "fix". Just return a fallback.
+	*/
+	return 0;   // or another constant fallback
+}
+
+int main(){
+	return 0;
+}
+```
+
+These patches ensure that:
+- **Patch 2** supplies safe, non-zero values to avoid a divide-by-zero scenario by assuming the input is under control and properly initialized.
+- **Patch 3** applies safety checks to ensure computations only occur within a partially validated safe range, providing some resilience against invalid inputs but not addressing all potential issues.
+System fingerprint: fp_37d212baff

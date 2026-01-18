@@ -1,0 +1,21 @@
+reply: Certainly! Based on the provided JSON template and the original code snippet, here are Patch 2 (Good source) and Patch 3 (Bad source Partial good sink):
+
+```json
+{
+    "Example 3": {
+        "CWE": "CWE-369-Divide-By-Zero",
+        "CVE": "CVE-2023-XXXX",  // hypothetical CVE ID
+        "Project": "example_project",
+        "Patch Information": "Juliet Dataset style patch generation",
+        "Original Code snippet": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\nint l2cap_config_req_Snippet(unsigned short cmd_len, unsigned char chan_conf_len){\n    int len;\n    /* Reject if config buffer is too small. */\n\tlen = cmd_len - 4; //considering sizeof(*req) = 4\n\tif (chan_conf_len + len > 128) { // considering sizeof(chan->conf_req) =128\n        return 0;\n    }\n    return len;\n}\n\nint main(){\n return 0;\n}\n",
+        "Patch 1 (Good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\nint l2cap_config_req_Snippet(unsigned short cmd_len, unsigned char chan_conf_len){\n    int len;\n    /* Reject if config buffer is too small. */\n\tlen = cmd_len - 4; //considering sizeof(*req) = 4\n\tif (len < 0 || chan_conf_len + len > 128) { // considering sizeof(chan->conf_req) =128\n        return 0;\n    }\n    return len;\n}\n\nint main(){\n return 0;\n}\n",
+        "Patch 2 (Good source)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\nint l2cap_config_req_Snippet(unsigned short cmd_len, unsigned char chan_conf_len){\n    int len;\n\n    /* === GOOD SOURCE ONLY === */\n    cmd_len = 5;  // Assign a safe, non-zero source to avoid negative length\n\n    /* === BAD SINK (NO CHECKS) === */\n    len = cmd_len - 4; // Safe with the good source\n    return len;\n}\n\nint main(){\n return 0;\n}\n",
+        "Patch 3 (Bad source Partial good sink)": "#include<stdio.h>\n#include<stdint.h>\n#include<limits.h>\n\nint l2cap_config_req_Snippet(unsigned short cmd_len, unsigned char chan_conf_len){\n    int len;\n\n    /* === PARTIAL GOOD SINK ===\n    * Fix applies ONLY when:\n    *     4 < cmd_len < 32\n    * This avoids negative length, but only for the limited range.\n    */\n    if (cmd_len > 4 && cmd_len < 32) {\n        len = cmd_len - 4;\n    } else {\n        /* === OUTSIDE SAFE RANGE ===\n        * No subtraction performed to avoid issues,\n        * but also no real \"fix\". Just return a fallback.\n        */\n        len = 0;   // or another constant fallback\n    }\n\n    if (chan_conf_len + len > 128) { // considering sizeof(chan->conf_req) =128\n        return 0;\n    }\n    return len;\n}\n\nint main(){\n return 0;\n}\n"
+    }
+}
+```
+
+Explanation:
+- **Patch 2 (Good source)**: This patch ensures that `cmd_len` is assigned a safe, non-zero value that will not cause a negative result when subtracted by 4, thus inherently mitigating the issue for this execution path without conditions.
+- **Patch 3 (Bad source Partial good sink)**: This patch provides a limited fix by applying a check that ensures `cmd_len` is within a safe range to avoid the calculation resulting in a negative length. Outside of this range, it doesn't perform subtraction and returns a fallback.
+System fingerprint: fp_ed643dde95

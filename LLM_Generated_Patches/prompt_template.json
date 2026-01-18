@@ -1,0 +1,162 @@
+{"Example 1": 
+    {"CWE": "CWE-369-Divide-By-Zero",
+    "CVE": "CVE-2014-0142-9302e863aa8baa5d932fc078967050c055fa1a7f",
+    "Project":  "qemu",
+    "Patch Information": "Juliet Dataset style patch generation",
+    "Original Code snippet" :
+    "#define EFBIG 27
+
+    int parallels_open_Snippet(int tracks){
+        /* === ORIGINAL BUGGY (VULNERABLE) === */
+        if (tracks > INT32_MAX/513) {
+            return -EFBIG;
+        }
+        return 512 / tracks;
+    }
+    int main(){
+        return 0;
+    }
+        ",
+
+    "Patch 1 (Good sink)":
+    "int parallels_open_Snippet(int tracks) {
+
+        /* === GOOD SINK ONLY (PATCHED) === */
+
+        /* GOOD SINK: Check for division-by-zero is added*/
+        if (tracks == 0) {
+            return -EINVAL;
+        }
+
+        /* Optional overflow-style validation (matching your earlier pattern) */
+        if (tracks > INT32_MAX / 513) {
+            return -EFBIG;
+        }
+
+        /* Safe computation */
+        return 512 / tracks;
+    }
+    int main(){
+        return 0;
+    }
+    ",
+    "Patch 2 (Good source)":
+    "int parallels_open_Snippet(int tracks) {
+        int ret = 0;
+
+        /* === GOOD SOURCE ONLY === */
+        tracks = 1;   // safe, non-zero source
+
+        /* === BAD SINK (NO CHECKS) === */
+        /* Still vulnerable if tracks were zero (but our source is safe) */
+        ret = 512 / tracks;
+
+        return ret;
+    }
+    int main(){
+        return 0;
+    }
+    ",
+    "Patch 3 (Bad source Partial good sink)":
+    "int parallels_open_Snippet(int tracks) {
+
+        /* === PARTIAL GOOD SINK ===
+        * Fix applies ONLY when:
+        *       1 < tracks < 50
+        * This avoids division-by-zero, but only for the limited range.
+        */
+        if (tracks > INT32_MAX/513) {
+            return -EFBIG;
+        }
+
+        if (tracks > 1 && tracks < 50) {
+            /* Safe range */
+            return 512 / tracks; 
+        }
+
+        /* === OUTSIDE SAFE RANGE ===
+        * No division performed to avoid crashes,
+        * but also no real "fix". Just return a fallback.
+        */
+
+        return 0;   // or another constant fallback
+    }
+    int main(){
+        return 0;
+    }
+    "},
+"Example 2":
+    {"CWE": "CWE-369-Divide-By-Zero",
+    "CVE" : "CVE-2016-8669-3592fe0c919cf27a81d8e9f9b4f269553418bb01",
+    "Project":  "qemu",
+    "Patch Information": "Juliet Dataset style patch generation",
+    "Original Code snippet" :
+    "int serial_update_parameters_Snippet(uint16_t divider, int baudbase)
+        {
+            /* === ORIGINAL BUGGY; the check for divider>baudbase is missing === */
+            if (divider == 0) {
+                return 0;
+            }
+            int speed= baudbase/divider;
+            return speed;
+        }
+        int main(){
+            return 0;
+        }",
+
+    "Patch 1 (Good sink)":
+    "int serial_update_parameters_Snippet(uint16_t divider, int baudbase)
+        {
+             /* === GOOD SINK === */
+            if (divider == 0 || divider> baudbase) {
+                return 0;
+            }
+            int speed= baudbase/divider;
+            return speed;
+        }
+    int main(){
+        return 0;
+    }
+    ",
+    "Patch 2 (Good source)":
+    "int serial_update_parameters_Snippet(uint16_t divider, int baudbase)
+        {
+            /* === GOOD SOURCE ONLY === */
+            /* Assign a safe, non-zero value to divider */
+            divider = 1;
+            baudbase = 2;
+
+            int speed = baudbase / divider;
+            return speed;
+        }
+    int main(){
+        return 0;
+    }
+    ",
+    "Patch 3 (Bad source Partial good sink)":
+    "int serial_update_parameters_Snippet(uint16_t divider, int baudbase)
+        {
+            /* === PARTIAL GOOD SINK ===
+            * Fix applies ONLY when:
+            *     divider= 1 and baudbase between 2 and 10
+            * This avoids division-by-zero, but only for the limited range.
+            */
+
+            if (divider==1 && baudbase>=2 && baudbase=<10) {
+                /* Safe range */
+                int speed = baudbase / divider;   // Safe because divider >= 2
+                return speed;
+            }
+
+            /* === OUTSIDE SAFE RANGE ===
+            * No division performed to avoid crashes,
+            * but also no real "fix". Just return a fallback.
+            */
+            return 0;   // or another constant fallback
+        }
+    int main(){
+        return 0;
+    }
+    "}
+}
+

@@ -1,0 +1,57 @@
+reply: Based on the provided JSON template and the original code snippet, here is the generation of Patch 2 (Good source) and Patch 3 (Bad source Partial good sink):
+
+### Patch 2 (Good source)
+```c
+#include<stdio.h>
+// #include<stdint.h>
+#include<limits.h> 
+
+int uvesafb_setcmap_Snippet(size_t size_entries, size_t len){
+    /* === GOOD SOURCE ONLY === */
+    /* Assign safe, non-zero values to avoid overflow */
+    size_entries = 1;
+    len = 1;
+
+    return size_entries * len;
+}
+
+int main(){
+    return 0;
+}
+```
+
+### Patch 3 (Bad source Partial good sink)
+```c
+#include<stdio.h>
+// #include<stdint.h>
+#include<limits.h> 
+
+#define SIZE_MAX        (~(size_t)0)
+
+int uvesafb_setcmap_Snippet(size_t size_entries, size_t len){
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when:
+    *       1 < size_entries < 1000 and len < SIZE_MAX / size_entries
+    * This avoids overflow, but only for the limited range.
+    */
+
+    if (size_entries > 1 && size_entries < 1000 && len < SIZE_MAX / size_entries) {
+        /* Safe range */
+        return size_entries * len; 
+    }
+
+    /* === OUTSIDE SAFE RANGE ===
+    * No multiplication performed to avoid overflow,
+    * but also no real "fix". Just return a fallback.
+    */
+
+    return 0;   // or another constant fallback
+}
+
+int main(){
+    return 0;
+}
+```
+
+In Patch 2, we define a good source with safe, non-zero values to prevent overflow. In Patch 3, we introduce a partial good sink that operates safely within a specific range, helping to minimize, but not completely eliminate, overflow risks.
+System fingerprint: fp_37d212baff

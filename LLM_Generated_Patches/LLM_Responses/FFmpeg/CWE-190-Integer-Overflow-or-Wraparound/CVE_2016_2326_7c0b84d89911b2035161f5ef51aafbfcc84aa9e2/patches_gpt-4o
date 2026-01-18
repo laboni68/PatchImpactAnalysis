@@ -1,0 +1,72 @@
+reply: Based on the provided JSON template and the original code snippet, the following patches are generated according to the description of Patch 2 (Good Source) and Patch 3 (Bad Source Partial Good Sink):
+
+### Patch 2 (Good Source)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+#define AV_NOPTS_VALUE          ((int64_t)UINT64_C(0x8000000000000000))
+#define EINVAL                  22
+
+int asf_write_packet(int64_t pts, int64_t dts){
+    /* === GOOD SOURCE ONLY === */
+    /* Use safe, non-zero source */
+    pts = 1000; // Assign a safe value for testing purposes
+    dts = 1000;
+
+    /* === BAD SINK (NO CHECKS) === */
+    /* Operating directly on reliable safe source without additional checks */
+    if(pts == AV_NOPTS_VALUE){
+        return -1;
+    }
+    return 0;
+}
+
+int main(){
+    return 0;
+}
+```
+
+### Patch 3 (Bad Source Partial Good Sink)
+```c
+#include<stdio.h>
+#include<stdint.h>
+#include<limits.h> 
+
+#define AV_NOPTS_VALUE          ((int64_t)UINT64_C(0x8000000000000000))
+#define PREROLL_TIME            3100
+#define ASF_INDEXED_INTERVAL    10000000
+#define EINVAL                  22
+
+int asf_write_packet(int64_t pts, int64_t dts){
+    /* === PARTIAL GOOD SINK ===
+    * Fix applies ONLY when:
+    *       pts value within safe bounds for certain computation.
+    */
+
+    pts = (pts != AV_NOPTS_VALUE) ? pts : dts;
+
+    /* Safe range checks */
+    if (pts > -PREROLL_TIME && pts <= (INT_MAX-3)/(10000LL * ASF_INDEXED_INTERVAL) - PREROLL_TIME) {
+        return 0; 
+    }
+
+    /* === OUTSIDE SAFE RANGE ===
+    * Set the pts to a default safe value or return fallback.
+    */
+    pts = 0; // or another constant fallback to allow function to proceed safely
+    if(pts == AV_NOPTS_VALUE){
+        return -1;
+    }
+
+    return 0;
+}
+
+int main(){
+    return 0;
+}
+```
+
+These patches follow the structure described in the examples you provided. Patch 2 introduces a good source, ensuring that input values are safe, while Patch 3 provides a partial good sink with limited applicability within specified safe ranges, along with a fallback mechanism for unsafe conditions.
+System fingerprint: fp_37d212baff
