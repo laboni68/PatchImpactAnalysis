@@ -87,6 +87,9 @@
 A patch from Qemu is shown in the figure where a modification is made to prevent buffer overflow by changing the type of the variable in_use at line 180, which is later used in line 1362. Our quantitative patch impact analysis shows that this update will impact 50% of the inputs for variable in_use with the corresponding non-equivalence condition: 2147483648 <= in_use.
 -->
 
+## Dataset information
+The number of lines of codes (LOC) of the programs in our dataset ranges between 8 to 64 with an average LOC of 24.76, 23.74, and 16.50, respectively for PatchBench, JulietBench and EqBench benchmarks.
+
 ## Patch Impact Analysis of EqBench 
 <table>
   <tr>
