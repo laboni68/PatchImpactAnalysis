@@ -1,3 +1,10 @@
+## Code patching: Source code level Equivalence but Non-equivalence
+<p align="center">
+  <img src="Figures/sourceCodeLevelEq.png" width="500">
+</p>
+
+The vulnerability is about subtraction on unsigned integers causing underflow. The order of operations and unsigned arithmetic semantics matter for security, even when the math is algebraically the same (might seem like a refactoring).
+
 ## Visualization of the Algorithm 2 (RangeSearch) and Algorithm 3 (Iterative Search)
 <table>
   <tr>
