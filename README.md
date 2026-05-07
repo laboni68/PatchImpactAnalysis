@@ -138,4 +138,7 @@ The (Left) figure presents a CVE of category CWE-190 which represents a numerica
 </table>
 The example shows CWE-191_Integer_underflow example with original vulnerable code snippet(left), bad snippet (middle one) and good snippet (right most one). 
 
+## Typo in the paper
+The example from Table 1 in RQ1 should be (the paper description is showing Table 1 row 1):
+In CWE-369: CVE_2014_93 patch from Qemu (Table 1 row 2), a datatype change from int to unsigned int results in equivalence only within the input range 0 ≤ x ≤ 2147483647, accounting for 49.99% of the input domain.
 
